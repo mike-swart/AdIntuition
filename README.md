@@ -19,7 +19,7 @@ How successfully can we show that there are advertisements on a social media pla
 	* **Transcripts**
 	* **Thumbnail**
 
-	The likely set of steps will be to cluster based off of if there is a known disclosure by using the description. Then, using this data cluster in the transcripts to learn any trends in how the transcript is related to the  
+	The likely set of steps will be to cluster based off of if there is a known disclosure by using the description. Then, using the descriptions cluster, we can extend to see if there are any trends in the transcripts that are present.
 
 3. User Testing
 	* Can test the browser extension to see if it can make it easier for a user to understand that there has been an affiliated marketing campaign and if it has been disclosed.
