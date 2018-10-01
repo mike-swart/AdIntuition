@@ -1,0 +1,22 @@
+{
+  "name": "Youtube Endorsement Detector",
+  "version": "1.0",
+  "description": "Shows if a content creator on Youtube is making money off of the video based off of a paid partnership with a company",
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+  // "content_scripts": [
+  //   {
+  //     "matches": ["*://www.youtube.com/*"],
+  //     "run_at": "document_end",
+  //     "js": ["contentScript.js"]
+  //   }
+  // ],
+  "browser_action": {
+    "default_title": "Title",
+    "default_popup": "popup.html"
+  },
+  "permissions": ["contextMenus", "activeTab"],
+  "manifest_version": 2
+}
