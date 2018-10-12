@@ -3,20 +3,12 @@
   "version": "1.0",
   "description": "Shows if a content creator on Youtube is making money off of the video based off of a paid partnership with a company",
   "background": {
-    "scripts": ["background.js"],
-    "persistent": false
+    "scripts": ["background.js"]
   },
-  // "content_scripts": [
-  //   {
-  //     "matches": ["*://www.youtube.com/*"],
-  //     "run_at": "document_end",
-  //     "js": ["contentScript.js"]
-  //   }
-  // ],
+  "permissions": ["activeTab", "tabs", "*://*.youtube.com/watch*"],
   "browser_action": {
-    "default_title": "Title",
+    "default_icon": "logo.png",
     "default_popup": "popup.html"
   },
-  "permissions": ["contextMenus", "activeTab"],
   "manifest_version": 2
 }

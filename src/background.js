@@ -1,37 +1,12 @@
-alert("Updated");
-chrome.browserAction.onClicked.addListener(function(tab) {
-	var re = /www.youtube.com/i;
-	if (tab.url.search(re) > -1) {
-		alert("on youtube");
-		chrome.tabs.executeScript({
-          // code: 'document.body.style.backgroundColor="orange"'
-          code: 'document.body.style.backgroundColor="orange"'
-        });
-	}
-});
+chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+    if (changeInfo.status == 'complete') {
+    	console.log("calling getAndChange From OnUpdated");
+        chrome.tabs.executeScript(tabId, {file: "getAndChangeBackground.js"});
+    }
+})
 
-function getPageDetails(callback) {
-    // Inject the content script into the current page
-    chrome.tabs.executeScript(null, { file: 'content.js' });
-    // When a message is received from the content script
-    chrome.runtime.onMessage.addListener(function(message) {
-        // Call the callback function
-        callback(message);
-    });
-};
-// chrome.runtime.onInstalled.addListener(function() {
-// 	// chrome.contextMenus.create({
-// 	// 	"id": "sampleContextMenu",
-// 	// 	"title": "Sample Context Menu",
-// 	// 	"contexts": ["selection"]
-// 	// });
-// });
-// chrome.tabs.onUpdated.addListener(function() {
-// 	if (tab.url.indexOf('http://youtube.com') == 0) {
-// 		chrome.pageAction.show(tabId);
-// 	}
-// })
-// chrome.webNavigation.onCompleted.addListener(function() {
-//   alert("On youtube");
-//   chrome.tabs.executeScript({code: 'document.body.style.backgroundColor="orange"'});
-// }, {url: [{urlMatches : 'https://www.youtube.com/'}]});
+chrome.runtime.onMessage.addListener(function (message) {
+	console.log(message);
+	alert(message);
+	window.open("popup.html", "extension_popup", "width=300,height=400,status=no,scrollbars=yes,resizable=no");
+});
