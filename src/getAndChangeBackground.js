@@ -1,5 +1,5 @@
 const NUM_RETRIES = 1;
-const HIGHLIGHT_COLOR = "#f5f7d2";
+const HIGHLIGHT_COLOR = "#cfd1b1";
 
 //text constants
 const BANNER_NORMAL = "AdIntuition detected a sponsorship in this video. Sponsored Links are highlighted in the description. Please click the AdIntuition icon above for more info.";
@@ -43,7 +43,7 @@ function changeInfo(retryNum, numRetries) {
 
 function remake() {
 	removeBanner();
-	chrome.runtime.sendMessage({"function": "change_icon", "icon":"logos/logo.png"});
+	chrome.runtime.sendMessage({"function": "reset_icon", "icon":"logos/logo.png"});
 	elems = document.getElementById("description").getElementsByTagName('a');
 	for (var i=0; i<elems.length; i++) {
 		elem.style.backgroundColor = "#FFFFFF";

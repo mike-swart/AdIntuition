@@ -16,6 +16,13 @@ chrome.runtime.onMessage.addListener(function(message, sender) {
 		console.log("Unknown Message Function");
 	}
 	else if (message.function === "change_icon") {
+		chrome.browserAction.setBadgeText({"text": "open", "tabId": sender.tab.id});
+		chrome.browserAction.setBadgeBackgroundColor({"color": "#cfd1b1", "tabId": sender.tab.id});
+		chrome.browserAction.setIcon({"path":message.icon, "tabId": sender.tab.id});
+	}
+	else if (message.function === "reset_icon") {
+		chrome.browserAction.setBadgeText({"text": "", "tabId": sender.tab.id});
+		chrome.browserAction.setBadgeBackgroundColor({"color": "#FFFFFF", "tabId": sender.tab.id});
 		chrome.browserAction.setIcon({"path":message.icon, "tabId": sender.tab.id});
 	}
 	else if (message.function === "log") {

@@ -9,7 +9,7 @@
   "permissions": ["activeTab", "tabs", "webNavigation", "notifications", "*://*.youtube.com/*"],
   "browser_action": {
     "default_icon": "logos/logo.png",
-    "default_title": "This is a default title",
+    "default_title": "Information about AdIntuition",
     "default_popup": "popup.html"
   },
   "manifest_version": 2
