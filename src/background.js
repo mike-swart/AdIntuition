@@ -1,12 +1,33 @@
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-    if (changeInfo.status == 'complete') {
+	const videoPattern = new RegExp("www.youtube.com/watch");
+	const userPattern = new RegExp("www.youtube.com/user");
+	const searchPattern = new RegExp("www.youtube.com/results");
+	//check the video
+    if (changeInfo.status ==  "complete" && videoPattern.exec(tab.url) !== null) { //TODO: this should change on navigating without a new tab
     	console.log("calling getAndChange From OnUpdated");
         chrome.tabs.executeScript(tabId, {file: "getAndChangeBackground.js"});
     }
+    //TODO: ADD in checks for user profiles and search results
+
 })
 
-chrome.runtime.onMessage.addListener(function (message) {
-	console.log(message);
-	alert(message);
-	window.open("popup.html", "extension_popup", "width=300,height=400,status=no,scrollbars=yes,resizable=no");
+chrome.runtime.onMessage.addListener(function(message, sender) {
+	if (!message.function) {
+		console.log("Unknown Message Function");
+	}
+	else if (message.function === "change_icon") {
+		chrome.browserAction.setIcon({"path":message.icon, "tabId": sender.tab.id});
+	}
+	else if (message.function === "log") {
+		console.log(message.message);
+	}
+	else if (message.function === "open_popup") {
+		const notification_options = {
+		    "type": 'basic',
+		    "iconUrl": "logos/logo.png",
+		    "title": 'AdIntuition',
+		    "message": 'This is sponsored content. Click on this icon to learn more',
+ 		};
+		chrome.notifications.create('reminder', notification_options, function(notificationId) {});
+	}
 });
