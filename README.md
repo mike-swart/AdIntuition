@@ -23,3 +23,22 @@ How successfully can we show that there are advertisements on a social media pla
 
 3. User Testing
 	* Can test the browser extension to see if it can make it easier for a user to understand that there has been an affiliated marketing campaign and if it has been disclosed.
+
+### Contents Layout
+
+| Folder Name                    | Description                                                                |
+| -----------------              | -----------                                                                |
+| data/                          | Folder containing the training set for the clustering of videos            |
+| src/data_reader/               | Folder containing the code to read the information in the ../data folder   |
+| src/logos/                     | Folder containing any necessary logos                                      |
+
+| File Name                      | Description                                                                |
+| -----------------              | -----------                                                                | 
+| src/background.js              | Code that is run to determine when to try to edit the page                 |
+| src/common.css                 | Constains all styles for the browser extension html elements               |
+| src/getAndChangeBackground.js  | Code to edit the youtube page                                              |
+| src/manifest.json              | Creates the correct formatting for the browser extension, with permissions, settings, and when files should be called |
+| src/options.html               | Page html of the settings page                                             |
+| src/options.js                 | Code to be called the options.html file. This makes the settings persistent|
+| src/popup.html                 | The html of the dropdown that pops up when icon is clicked in the upper right hand corner |
+| src/popup.js                   | Allows for the button to be clicked on popup.html                          |

@@ -1,12 +1,15 @@
-const NUM_RETRIES = 1;
-const HIGHLIGHT_COLOR = "#cfd1b1";
+//import { MutationSummary } from 'mutation-summary/src/mutation-summary.js';
+
+var NUM_RETRIES = 5;
+//var HIGHLIGHT_COLOR = "#cfd1b1";
+var HIGHLIGHT_COLOR = "#fccdd3";
 
 //text constants
-const BANNER_NORMAL = "AdIntuition detected a sponsorship in this video. Sponsored Links are highlighted in the description. Please click the AdIntuition icon above for more info.";
-const BUTTON_NORMAL = "Exit";
-const BANNER_RETRY = "AdIntuition did not load properly. Click to retry";
-const BUTTON_RETRY = "Retry";
-const BANNER_OPTIONS = {
+var BANNER_NORMAL = "AdIntuition detected a sponsorship in this video. Sponsored Links are highlighted in the description. Please click the AdIntuition icon above for more info.";
+var BUTTON_NORMAL = "Exit";
+var BANNER_RETRY = "AdIntuition did not load properly. Click to retry";
+var BUTTON_RETRY = "Retry";
+var BANNER_OPTIONS = {
 	"normal": {
 		"text": BANNER_NORMAL,
 		"button": BUTTON_NORMAL,
@@ -19,6 +22,17 @@ const BANNER_OPTIONS = {
 
 window.setTimeout(function() {changeInfo(0, NUM_RETRIES);}, 1000);
 
+// function observeMutations(mutations) {
+// 	console.log(mutations);
+// }
+
+// function callObserve() {
+// 	var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
+// 	observer = new MutationObserver(observeMutations);
+// 	var elem = document.getElementById('description');
+// 	observer.observe(elem, { childList: true, subtree: true});
+// }
+
 function changeInfo(retryNum, numRetries) {
 	if (retryNum === numRetries) { //could not load the page
 		console.log("Could Not Load");
@@ -29,6 +43,7 @@ function changeInfo(retryNum, numRetries) {
 		window.setTimeout(function() {changeInfo(retryNum + 1, numRetries);}, 1000);
 		return
 	}
+	//callObserve();
 	//maybe use a promise chain to remake and then create
 	var disclosureWasPresent = editDescription(document.getElementById("description").getElementsByTagName('a'));
 	// highlight(0, disclosureWasPresent);
@@ -50,13 +65,28 @@ function remake() {
 	}
 }
 
+// function addCSS() {
+// 	var head = document.getElementsByTagName('head')[0];
+//     var link = document.createElement('link');
+//     //link.id = "myCss";
+//     link.rel = 'stylesheet';
+//     link.type = 'text/css';
+//     link.href = 'common.css';
+//     console.log(link.href);
+//     //link.media = 'all';
+//     head.appendChild(link);
+// }
+
 function addBanner(bannerType) {
+	//addCSS();
 	const bannerConstants = BANNER_OPTIONS[bannerType];
 	var banner = document.createElement("div");
 	banner.innerHTML = "<div id='AdIntuition' style='background-color:" + HIGHLIGHT_COLOR + "; text-align:right; padding-right:10px;'>"+ bannerConstants.text + "&nbsp&nbsp</div>";
 	element = document.getElementById("masthead");
 	element.parentNode.insertBefore(banner, element.nextSibling);
 	var bannerButton = document.createElement("button");
+	// bannerButton.href = "#";
+	// bannerButton.class = "button";
 	bannerButton.innerHTML = bannerConstants.button
 	if (bannerType === "retry") {
 		bannerButton.onclick = (function() {removeBanner();changeInfo(0, NUM_RETRIES);})
@@ -90,8 +120,12 @@ function editDescription(desc) {
 }
 
 function checkSponsored(index) {
-	const bitlyPattern = new RegExp("http://bit.ly/*");
-	if (bitlyPattern.exec(document.getElementById("description").getElementsByTagName('a')[index].innerHTML) !== null) {
+	const bitlyPattern = new RegExp("/*://bit.ly/*");
+	document.getElementById("description").getElementsByTagName('a')[index].style.backgroundColor = "#FFFFFF";
+	var url = document.getElementById("description").getElementsByTagName('a')[index].innerHTML;
+	var req = new Request(url);
+	chrome.runtime.sendMessage({"function": "url_check", "url": url});
+	if (bitlyPattern.exec(url) !== null) {
 		document.getElementById("description").getElementsByTagName('a')[index].onmouseover = (function() {
 			document.getElementById("AdIntuition").style.backgroundColor = getRandomColor();
 		});
@@ -145,4 +179,23 @@ function highlight(retryNum, shouldChange) {
 	}
 }
 
+
+//second reader
+
+
+///http redirects -- make the requests yourself
+	// log all urls that you see in this process and match them
+	//mutation observer or mutation summary <-- use these libraries
+//settings-- use chrome.storage
+//file a bug saying that client side redirects are not supported
+//inject the javascript into the page as a script tab-- use the MutationSummary.js
+	// --make sure that Youtube is not changing the DOM constantly
+
+//Make a schedule for when you want things done
+// -- steps and when we want them done
+//Step 1-- get affiliate marketing part done
+//Search results, settings, etc.
+//notify when done
+
+//rule list parsers-- feed it the regex list and it will give you a parser
 

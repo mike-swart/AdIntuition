@@ -3,14 +3,20 @@
   "version": "1.0",
   "description": "Shows if a content creator on Youtube is making money off of the video based off of a paid partnership with a company",
   "background": {
-    "scripts": ["background.js"],
+    "scripts": ["background.js", "mutation-summary/src/mutation-summary.js"],
     "persistent": false
   },
-  "permissions": ["activeTab", "tabs", "webNavigation", "notifications", "*://*.youtube.com/*"],
+  "permissions": ["activeTab", "tabs", "webNavigation", "notifications", "storage", "*://*/"],
   "browser_action": {
-    "default_icon": "logos/logo.png",
+    "default_icon": "logos/edit1.png",
     "default_title": "Information about AdIntuition",
     "default_popup": "popup.html"
+  },
+  "options_page": "options.html",
+  "icons": {
+    "16": "logos/logo.png",
+    "48": "logos/logo.png",
+    "128": "logos/logo.png"
   },
   "manifest_version": 2
 }
