@@ -3,7 +3,7 @@
   "version": "1.0",
   "description": "Shows if a content creator on Youtube is making money off of the video based off of a paid partnership with a company",
   "background": {
-    "scripts": ["background.js", "mutation-summary/src/mutation-summary.js"],
+    "scripts": ["background.js"],
     "persistent": false
   },
   "permissions": ["activeTab", "tabs", "webNavigation", "notifications", "storage", "*://*/"],

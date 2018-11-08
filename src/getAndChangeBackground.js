@@ -1,59 +1,77 @@
-//import { MutationSummary } from 'mutation-summary/src/mutation-summary.js';
-
 var NUM_RETRIES = 5;
-//var HIGHLIGHT_COLOR = "#cfd1b1";
 var HIGHLIGHT_COLOR = "#fccdd3";
 
 //text constants
-var BANNER_NORMAL = "AdIntuition detected a sponsorship in this video. Sponsored Links are highlighted in the description. Please click the AdIntuition icon above for more info.";
+var BANNER_NORMAL = "AdIntuition detected a sponsorship in this video";
 var BUTTON_NORMAL = "Exit";
-var BANNER_RETRY = "AdIntuition did not load properly. Click to retry";
-var BUTTON_RETRY = "Retry";
 var BANNER_OPTIONS = {
 	"normal": {
 		"text": BANNER_NORMAL,
 		"button": BUTTON_NORMAL,
 	},
-	"retry": {
-		"text": BANNER_RETRY,
-		"button": BUTTON_RETRY,
-	},
 }
 
-window.setTimeout(function() {changeInfo(0, NUM_RETRIES);}, 1000);
+//settings
+var shouldShowBanner = true;
+var shouldHighlightURL = true;
+var shouldHighlightTitle = false;
+var shouldPlaySound = false;
+var shouldShowDesktopNotification = false;
 
-// function observeMutations(mutations) {
-// 	console.log(mutations);
-// }
 
-// function callObserve() {
-// 	var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
-// 	observer = new MutationObserver(observeMutations);
-// 	var elem = document.getElementById('description');
-// 	observer.observe(elem, { childList: true, subtree: true});
-// }
+var observer = null;
 
-function changeInfo(retryNum, numRetries) {
-	if (retryNum === numRetries) { //could not load the page
-		console.log("Could Not Load");
-		addBanner("retry");
-		return
+run();
+
+function run() {
+	getOptions();
+	if (!observer) {
+		console.log("adding observer");
+		addObserver();
 	}
-	if (document.getElementById("description") === null) { //the description has not loaded yet
-		window.setTimeout(function() {changeInfo(retryNum + 1, numRetries);}, 1000);
-		return
+}
+
+function getOptions() {
+	chrome.storage.sync.get({
+		banner: true,
+		textHighlighted: true,
+		titleHighlighted: false,
+		sound: false,
+		desktopNotification: false,
+	}, function(items) {
+		shouldShowBanner = items.banner;
+		shouldHighlightURL = items.textHighlighted;
+		shouldHighlightTitle = items.titleHighlighted;
+		shouldPlaySound = items.sound;
+		shouldShowDesktopNotification = items.desktopNotification;
+	});
+}
+
+function addObserver(){
+	try {
+		observer = new MutationSummary({
+			callback: handleChanges,
+			queries: [
+				{ element: ["yt-formatted-string.content.style-scope.ytd-video-secondary-info-renderer"]},
+				{ element: "yt-formatted-string.content.style-scope.ytd-video-secondary-info-renderer"},
+			] //TODO: if no description is present, then these do not work-- need to figure out #description
+		});
+		console.log("made it");
+		//TODO: if this is called on the second pass, description may already have been changed-- could be worth checking
+		//maybe could slightly edit desc...
 	}
-	//callObserve();
-	//maybe use a promise chain to remake and then create
+	catch(err) {
+		//with the background resources dict, this should not be necessary
+		console.log("catching");
+		chrome.runtime.sendMessage({"function": "getMutationSummary"});
+		window.setTimeout(function() {ms();}, 1);
+	}
+}
+
+function handleChanges(summaries) {
+	//getOptions();
+	console.log(summaries[0].added);
 	var disclosureWasPresent = editDescription(document.getElementById("description").getElementsByTagName('a'));
-	// highlight(0, disclosureWasPresent);
-	if (disclosureWasPresent) {
-		rotateIcon(0);
-		addBanner("normal");
-	}
-	else {
-		remake();
-	}
 }
 
 function remake() {
@@ -71,30 +89,48 @@ function remake() {
 //     //link.id = "myCss";
 //     link.rel = 'stylesheet';
 //     link.type = 'text/css';
-//     link.href = 'common.css';
-//     console.log(link.href);
-//     //link.media = 'all';
+//     link.href = 'chrome-extension://pjhkaoijehhploklnfnoohicfjpcnebf/common.css';
 //     head.appendChild(link);
+//     console.log("here");
 // }
 
+function playSound() {
+	if (shouldPlaySound) {
+		chrome.runtime.sendMessage({"function": "play_sound"});
+	}
+}
+
+function showDesktopNotification() {
+	if (shouldShowDesktopNotification) {
+		chrome.runtime.sendMessage({"function": "open_desktop_notification"});
+	}
+}
+
 function addBanner(bannerType) {
-	//addCSS();
+	//in case banner is not selected in settings, add another invisible tag
+	if (document.getElementById("AdIntuition") !== null) {
+		return;
+	}
 	const bannerConstants = BANNER_OPTIONS[bannerType];
 	var banner = document.createElement("div");
-	banner.innerHTML = "<div id='AdIntuition' style='background-color:" + HIGHLIGHT_COLOR + "; text-align:right; padding-right:10px;'>"+ bannerConstants.text + "&nbsp&nbsp</div>";
+	banner.innerHTML = "<div id='AdIntuition' style='background-color:" + HIGHLIGHT_COLOR + "; text-align:right; padding-right:10px; padding-bottom:1px; padding-top:1px;'>"+ bannerConstants.text + "&nbsp&nbsp</div>";
 	element = document.getElementById("masthead");
 	element.parentNode.insertBefore(banner, element.nextSibling);
-	var bannerButton = document.createElement("button");
-	// bannerButton.href = "#";
-	// bannerButton.class = "button";
+	var bannerButton = document.createElement("a");
+	bannerButton.href = "#";
+	bannerButton.classList.add("bannerbutton");
 	bannerButton.innerHTML = bannerConstants.button
-	if (bannerType === "retry") {
-		bannerButton.onclick = (function() {removeBanner();changeInfo(0, NUM_RETRIES);})
+	bannerButton.onclick = (function() {removeBanner();})
+	document.getElementById("AdIntuition").appendChild(bannerButton);
+	if (!shouldShowBanner) { //use settings
+		document.getElementById("AdIntuition").style.display = "none";
 	}
 	else {
-		bannerButton.onclick = (function() {removeBanner();})
+		document.getElementById("AdIntuition").style.display = "block";
 	}
-	document.getElementById("AdIntuition").appendChild(bannerButton);
+	playSound();
+	showDesktopNotification();
+	highlightTitle();
 }
 
 function rotateIcon(stateNum) {
@@ -109,6 +145,7 @@ function rotateIcon(stateNum) {
 }
 
 function editDescription(desc) {
+	removeBanner();
 	var haveSeenMatch = false;
 	for (var i=0; i<desc.length; i++) {
 		var check = checkSponsored(i);
@@ -120,31 +157,43 @@ function editDescription(desc) {
 }
 
 function checkSponsored(index) {
-	const bitlyPattern = new RegExp("/*://bit.ly/*");
+	const bitlyPattern = new RegExp("https://");
 	document.getElementById("description").getElementsByTagName('a')[index].style.backgroundColor = "#FFFFFF";
 	var url = document.getElementById("description").getElementsByTagName('a')[index].innerHTML;
-	var req = new Request(url);
-	chrome.runtime.sendMessage({"function": "url_check", "url": url});
-	if (bitlyPattern.exec(url) !== null) {
-		document.getElementById("description").getElementsByTagName('a')[index].onmouseover = (function() {
+	var wasRedirect = checkRedirect(url, index);
+	if (wasRedirect) {
+		/*document.getElementById("description").getElementsByTagName('a')[index].onmouseover = (function() {
 			document.getElementById("AdIntuition").style.backgroundColor = getRandomColor();
 		});
 		document.getElementById("description").getElementsByTagName('a')[index].onmouseout = (function(){
 			document.getElementById("AdIntuition").style.backgroundColor = HIGHLIGHT_COLOR;
-		});
+		});*/
 		document.getElementById("description").getElementsByTagName('a')[index].style.backgroundColor = HIGHLIGHT_COLOR;
 		return true;
 	}
 	return false;
 }
 
-function getRandomColor(){
-	var str = "#";
-	var possibleVals = ["0","1","2","3","4","5","6","7","8","9","A","B","C","D","E"];
-	for (var i=0; i<6;i++) {
-		str += possibleVals[Math.floor(Math.random() * possibleVals.length)];
+function checkRedirect(url, index) {
+	if (url.substring(0,5) === "http:") {
+		url = "https" + url.substring(4);
 	}
-	return str;
+	console.log(url);
+	var xhr = new XMLHttpRequest();
+	xhr.onreadystatechange = function(e) {
+		if (xhr.status == 200 && xhr.readyState == 4) {
+			if (url != xhr.responseURL) {
+				addBanner("normal");
+				console.log(url + " --> " + xhr.responseURL);
+				var headers = xhr.getAllResponseHeaders();
+				//console.log(headers);
+				document.getElementById("description").getElementsByTagName('a')[index].style.backgroundColor = HIGHLIGHT_COLOR;
+				checkRedirect(xhr.responseURL, index);
+			}
+		}
+	}
+	xhr.open("GET", url, true);
+	xhr.send();
 }
 
 function removeBanner() {
@@ -154,29 +203,20 @@ function removeBanner() {
     }
 }
 
-function highlight(retryNum, shouldChange) {
+function highlightTitle() {
 	//element to highlight. This is the Title Box
 	const ELEM_ID = "info-contents";
-	console.log("highlight");
 
 	//set the correct color
-	var color = "#000000";
-	if (shouldChange) {color = getRandomColor();}
-
-	if (retryNum === NUM_RETRIES) { //the page is not loading
-		console.log("Could Not Highlight");
-		return
+	if (document.getElementById(ELEM_ID) !== null && shouldHighlightTitle) { //the element is not yet found
+		document.getElementById(ELEM_ID).style.backgroundColor = HIGHLIGHT_COLOR;
 	}
-	if (document.getElementById(ELEM_ID) === null) { //the element is not yet found
-		window.setTimeout(function() {highlight(retryNum + 1);}, 1000);
-		return
-	}
-	if (document.getElementById(ELEM_ID).style.backgroundColor === "" && shouldChange) { //the box is not highlighted but should be
+	/*if (document.getElementById(ELEM_ID).style.backgroundColor === "" && shouldChange) { //the box is not highlighted but should be
 		document.getElementById(ELEM_ID).style.backgroundColor = color;
 	}
 	else { //the box should not be highlighted
 		document.getElementById(ELEM_ID).style.backgroundColor == "";
-	}
+	}*/
 }
 
 
