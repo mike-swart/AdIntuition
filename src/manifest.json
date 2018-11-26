@@ -12,6 +12,13 @@
     "default_title": "Information about AdIntuition",
     "default_popup": "popup.html"
   },
+  "content_scripts": [
+    {
+      "matches": ["*://www.youtube.com/watch*"],
+      "js": ["getAndChangeBackground.js"],
+      "css": ["common.css"],
+      "run_at": "document_start"
+  }],
   "options_page": "options.html",
   "icons": {
     "16": "logos/logo.png",

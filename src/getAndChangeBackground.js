@@ -18,14 +18,12 @@ var shouldHighlightTitle = false;
 var shouldPlaySound = false;
 var shouldShowDesktopNotification = false;
 
-
-var observer = null;
-
 run();
 
 function run() {
 	getOptions();
-	if (!observer) {
+	console.log(document.getElementById("AdIntuitionMarker"));
+	if (!document.getElementById("AdIntuitionMarker")) {
 		console.log("adding observer");
 		addObserver();
 	}
@@ -47,31 +45,39 @@ function getOptions() {
 	});
 }
 
+function printInDumbObserver() {
+	console.log("In dumb observer");
+}
+
 function addObserver(){
 	try {
-		observer = new MutationSummary({
+		var observer = new MutationSummary({
 			callback: handleChanges,
 			queries: [
 				{ element: ["yt-formatted-string.content.style-scope.ytd-video-secondary-info-renderer"]},
 				{ element: "yt-formatted-string.content.style-scope.ytd-video-secondary-info-renderer"},
 			] //TODO: if no description is present, then these do not work-- need to figure out #description
 		});
-		console.log("made it");
-		//TODO: if this is called on the second pass, description may already have been changed-- could be worth checking
-		//maybe could slightly edit desc...
+		var marker = document.createElement("div");
+		marker.id = "AdIntuitionMarker";
+		document.lastElementChild.appendChild(marker);
 	}
 	catch(err) {
-		//with the background resources dict, this should not be necessary
+		console.log(err);
 		console.log("catching");
 		chrome.runtime.sendMessage({"function": "getMutationSummary"});
-		window.setTimeout(function() {ms();}, 1);
+		window.setTimeout(function() {addObserver();}, 5);
 	}
 }
 
 function handleChanges(summaries) {
 	//getOptions();
-	console.log(summaries[0].added);
-	var disclosureWasPresent = editDescription(document.getElementById("description").getElementsByTagName('a'));
+	removeBanner();
+	var desc = document.getElementById("description").getElementsByTagName('a');
+	var haveSeenMatch = false;
+	for (var i=0; i<desc.length; i++) {
+		checkSponsored(i);
+	}
 }
 
 function remake() {
@@ -82,17 +88,6 @@ function remake() {
 		elem.style.backgroundColor = "#FFFFFF";
 	}
 }
-
-// function addCSS() {
-// 	var head = document.getElementsByTagName('head')[0];
-//     var link = document.createElement('link');
-//     //link.id = "myCss";
-//     link.rel = 'stylesheet';
-//     link.type = 'text/css';
-//     link.href = 'chrome-extension://pjhkaoijehhploklnfnoohicfjpcnebf/common.css';
-//     head.appendChild(link);
-//     console.log("here");
-// }
 
 function playSound() {
 	if (shouldPlaySound) {
@@ -117,11 +112,12 @@ function addBanner(bannerType) {
 	element = document.getElementById("masthead");
 	element.parentNode.insertBefore(banner, element.nextSibling);
 	var bannerButton = document.createElement("a");
-	bannerButton.href = "#";
 	bannerButton.classList.add("bannerbutton");
 	bannerButton.innerHTML = bannerConstants.button
 	bannerButton.onclick = (function() {removeBanner();})
 	document.getElementById("AdIntuition").appendChild(bannerButton);
+
+	//NOTE: Any currently open tabs will need to be refreshed
 	if (!shouldShowBanner) { //use settings
 		document.getElementById("AdIntuition").style.display = "none";
 	}
@@ -144,43 +140,28 @@ function rotateIcon(stateNum) {
 	}, 500);
 }
 
-function editDescription(desc) {
-	removeBanner();
-	var haveSeenMatch = false;
-	for (var i=0; i<desc.length; i++) {
-		var check = checkSponsored(i);
-		if (check) {
-			haveSeenMatch = true;
-		}
-	}
-	return haveSeenMatch;
-}
-
 function checkSponsored(index) {
-	const bitlyPattern = new RegExp("https://");
 	document.getElementById("description").getElementsByTagName('a')[index].style.backgroundColor = "#FFFFFF";
 	var url = document.getElementById("description").getElementsByTagName('a')[index].innerHTML;
-	var wasRedirect = checkRedirect(url, index);
-	if (wasRedirect) {
-		/*document.getElementById("description").getElementsByTagName('a')[index].onmouseover = (function() {
-			document.getElementById("AdIntuition").style.backgroundColor = getRandomColor();
-		});
-		document.getElementById("description").getElementsByTagName('a')[index].onmouseout = (function(){
-			document.getElementById("AdIntuition").style.backgroundColor = HIGHLIGHT_COLOR;
-		});*/
-		document.getElementById("description").getElementsByTagName('a')[index].style.backgroundColor = HIGHLIGHT_COLOR;
-		return true;
-	}
-	return false;
+	checkRedirect(url, index);
 }
 
 function checkRedirect(url, index) {
 	if (url.substring(0,5) === "http:") {
 		url = "https" + url.substring(4);
 	}
+	if (url.substring(0,6) !== "https:") {
+		return false
+	}
 	console.log(url);
+	//TODO: should probably check the url using regex or add a try/catch
 	var xhr = new XMLHttpRequest();
 	xhr.onreadystatechange = function(e) {
+		//look for 300, which is redirect
+		if (xhr.status == 300) {
+			console.log("300");
+			console.log(xhr);
+		}
 		if (xhr.status == 200 && xhr.readyState == 4) {
 			if (url != xhr.responseURL) {
 				addBanner("normal");
@@ -188,6 +169,12 @@ function checkRedirect(url, index) {
 				var headers = xhr.getAllResponseHeaders();
 				//console.log(headers);
 				document.getElementById("description").getElementsByTagName('a')[index].style.backgroundColor = HIGHLIGHT_COLOR;
+				/*document.getElementById("description").getElementsByTagName('a')[index].onmouseover = (function() {
+					document.getElementById("AdIntuition").style.backgroundColor = getRandomColor();
+				});
+				document.getElementById("description").getElementsByTagName('a')[index].onmouseout = (function(){
+					document.getElementById("AdIntuition").style.backgroundColor = HIGHLIGHT_COLOR;
+				});*/
 				checkRedirect(xhr.responseURL, index);
 			}
 		}
@@ -222,7 +209,6 @@ function highlightTitle() {
 
 //second reader
 
-
 ///http redirects -- make the requests yourself
 	// log all urls that you see in this process and match them
 	//mutation observer or mutation summary <-- use these libraries
@@ -234,8 +220,16 @@ function highlightTitle() {
 //Make a schedule for when you want things done
 // -- steps and when we want them done
 //Step 1-- get affiliate marketing part done
-//Search results, settings, etc.
+//Search results, settings, etc.-- would also do this through loading each video, looking at html and then checking each url redirect-- if there is a thing return
 //notify when done
 
 //rule list parsers-- feed it the regex list and it will give you a parser
+
+//make sure that any redirect does not load as a click-- this could be seen as click-farming- fraudalant
+// do not lead to false clicks-- only check for header redirects
+//make sure you are not actually setting headers-- this could set cookies, which could be illegal
+//send some hardcoded useragent-- do not use the browser's user data
+//use a very barebones 
+
+//storage or cache
 

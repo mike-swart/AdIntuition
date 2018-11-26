@@ -1,20 +1,3 @@
-chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-	const videoPattern = new RegExp("www.youtube.com/watch");
-	const userPattern = new RegExp("www.youtube.com/user");
-	const searchPattern = new RegExp("www.youtube.com/results");
-    if (changeInfo.status ===  "loading") {
-    	if (videoPattern.exec(tab.url) !== null) { //TODO: this should change on navigating without a new tab
-    		chrome.tabs.insertCSS(tabId, {file: "common.css"});
-			chrome.tabs.executeScript(tabId, {file: 'mutation-summary/src/mutation-summary.js'});
-			chrome.tabs.executeScript(tabId, {file: "getAndChangeBackground.js"});
-    }
-    //TODO: ADD in checks for user profiles and search results
-})
-
-// chrome.tabs.onRemoved.addListener(function(tabId, removeInfo) {
-//	return
-// })
-
 //listen to messages
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 	if (!message.function) {
