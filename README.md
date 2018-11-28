@@ -42,3 +42,11 @@ How successfully can we show that there are advertisements on a social media pla
 | src/options.js                 | Code to be called the options.html file. This makes the settings persistent|
 | src/popup.html                 | The html of the dropdown that pops up when icon is clicked in the upper right hand corner |
 | src/popup.js                   | Allows for the button to be clicked on popup.html                          |
+
+
+### Running the server
+In the server directory:
+
+`node server.js`
+`ngrok http 4567`
+Then, you must use the https forwarding link in the getAndChangeBackground.js SERVER_ADDRESS variable

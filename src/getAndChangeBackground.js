@@ -1,5 +1,6 @@
 var NUM_RETRIES = 5;
 var HIGHLIGHT_COLOR = "#fccdd3";
+var SERVER_ADDRESS = "https://2f6221a3.ngrok.io"
 
 //text constants
 var BANNER_NORMAL = "AdIntuition detected a sponsorship in this video";
@@ -22,9 +23,7 @@ run();
 
 function run() {
 	getOptions();
-	console.log(document.getElementById("AdIntuitionMarker"));
 	if (!document.getElementById("AdIntuitionMarker")) {
-		console.log("adding observer");
 		addObserver();
 	}
 }
@@ -45,10 +44,6 @@ function getOptions() {
 	});
 }
 
-function printInDumbObserver() {
-	console.log("In dumb observer");
-}
-
 function addObserver(){
 	try {
 		var observer = new MutationSummary({
@@ -63,10 +58,9 @@ function addObserver(){
 		document.lastElementChild.appendChild(marker);
 	}
 	catch(err) {
-		console.log(err);
-		console.log("catching");
+		//console.log(err);
 		chrome.runtime.sendMessage({"function": "getMutationSummary"});
-		window.setTimeout(function() {addObserver();}, 5);
+		window.setTimeout(function() {addObserver();}, 20);
 	}
 }
 
@@ -147,40 +141,22 @@ function checkSponsored(index) {
 }
 
 function checkRedirect(url, index) {
-	if (url.substring(0,5) === "http:") {
-		url = "https" + url.substring(4);
-	}
-	if (url.substring(0,6) !== "https:") {
-		return false
-	}
-	console.log(url);
-	//TODO: should probably check the url using regex or add a try/catch
 	var xhr = new XMLHttpRequest();
-	xhr.onreadystatechange = function(e) {
-		//look for 300, which is redirect
-		if (xhr.status == 300) {
-			console.log("300");
-			console.log(xhr);
-		}
-		if (xhr.status == 200 && xhr.readyState == 4) {
-			if (url != xhr.responseURL) {
-				addBanner("normal");
-				console.log(url + " --> " + xhr.responseURL);
-				var headers = xhr.getAllResponseHeaders();
-				//console.log(headers);
-				document.getElementById("description").getElementsByTagName('a')[index].style.backgroundColor = HIGHLIGHT_COLOR;
-				/*document.getElementById("description").getElementsByTagName('a')[index].onmouseover = (function() {
-					document.getElementById("AdIntuition").style.backgroundColor = getRandomColor();
-				});
-				document.getElementById("description").getElementsByTagName('a')[index].onmouseout = (function(){
-					document.getElementById("AdIntuition").style.backgroundColor = HIGHLIGHT_COLOR;
-				});*/
-				checkRedirect(xhr.responseURL, index);
-			}
+	xhr.open("GET", SERVER_ADDRESS + "/?url=" + url, true);
+	xhr.onload = function() {
+		if (xhr.response === 'true') {
+			//A match was found!!!
+			addBanner("normal");
+			document.getElementById("description").getElementsByTagName('a')[index].style.backgroundColor = HIGHLIGHT_COLOR;
 		}
 	}
-	xhr.open("GET", url, true);
 	xhr.send();
+}
+
+function urlMatches(url) {
+	//check in the ../extra directory to see how we got this string
+	const str = "(ad.admitad.com/g/)|(ad.admitad.com/goto/)|(performance.affiliaxe.com/.*\\?aff_id=)|(performance.affiliaxe.com/.*&aff_id=)|(s.aliexpress.com/.*\\?af=)|(s.aliexpress.com/.*&af=)|(amazon.com/.*\\?tag=)|(amazon.com/.*&tag=)|(amazon.de/.*\\?tag=)|(amazon.de/.*&tag=)|(amazon.it/.*\\?tag=)|(amazon.it/.*&tag=)|(amazon.in/.*\\?tag=)|(amazon.in/.*&tag=)|(amazon.fr/.*\\?tag=)|(amazon.fr/.*&tag=)|(primevideo.com/.*\\?ref=)|(primevideo.com/.*&ref=)|(itunes.apple.com/.*\\?at=)|(itunes.apple.com/.*&at=)|(apple.com/.*\\?afid=)|(apple.com/.*&afid=)|(affiliates.audiobooks.com/.*\\?a_aid=.*&a_bid=)|(affiliates.audiobooks.com/.*\\?a_bid=.*&a_aid=)|(affiliates.audiobooks.com/.*&a_bid=.*&a_aid=)|(avantlink.com/.*\\?pw=)|(avantlink.com/.*&pw=)|(secure.avangate.com/.*\\?affiliate=)|(secure.avangate.com/.*&affiliate=)|(awin1.com/.*\\?awinaffid=)|(awin1.com/.*&awinaffid=)|(ad.zanox.com/ppc^)|(zenaps.com/rclick.php\\?)|(banggood.com/.*\\?p=)|(banggood.com/.*&p=)|(bookdepository.com/.*\\?a_aid=)|(bookdepository.com/.*&a_aid=)|(booking.com/.*\\?aid=)|(booking.com/.*&aid=)|(hop.clickbank.net^)|(anrdoezrs.net/click-)|(cj.dotomi.com^)|(dpbolvw.net/click-)|(emjcd.com^)|(jdoqocy.com/click-)|(kqzyfj.com/click-)|(qksrv.net^)|(tkqlhce.com/click-)|(designmodo.com/\\?u=)|(rover.ebay.com/.*\\?campid=)|(rover.ebay.com/.*&campid=)|(audiojungle.net/.*\\?ref=)|(audiojungle.net/.*&ref=)|(codecanyon.net/.*\\?ref=)|(codecanyon.net/.*&ref=)|(marketplace.envato.com/.*\\?ref=)|(marketplace.envato.com/.*&ref=)|(graphicriver.net/.*\\?ref=)|(graphicriver.net/.*&ref=)|(themeforest.net/.*\\?ref=)|(themeforest.net/.*&ref=)|(videohive.net/.*\\?ref=)|(videohive.net/.*&ref=)|(buyeasy.by/cashback/)|(buyeasy.by/redirect/)|(flipkart.com/.*\\?affid=)|(flipkart.com/.*&affid=)|(gtomegaracing.com/.*\\?tracking=)|(gtomegaracing.com/.*&tracking=)|(search.hotellook.com/.*\\?marker=)|(search.hotellook.com/.*&marker=)|(hotmart.net.br/.*\\?a=)|(hotmart.net.br/.*&a=)|(7eer.net/c/)|(evyy.net/c/)|(kontrolfreek.com/.*\\?a_aid=)|(kontrolfreek.com/.*&a_aid=)|(online.ladbrokes.com/promoRedirect\\?key=)|(online.ladbrokes.com/promoRedirect\\?.*&key=)|(makeupgeek.com/.*\\?acc=)|(makeupgeek.com/.*&acc=)|(gopjn.com/t/)|(pjatr.com/t/)|(pjtra.com/t/)|(pntra.com/t/)|(pntrac.com/t/)|(pntrs.com/t/)|(click.linksynergy.com/.*\\?id=)|(click.linksynergy.com/.*&id=)|(go.redirectingat.com/.*\\?id=)|(go.redirectingat.com/.*&id=)|(olymptrade.com/.*\\?affiliate_id=)|(olymptrade.com/.*&affiliate_id=)|(rstyle.me^)|(shopstyle.it^)|(shareasale.com/r.cfm^)|(shareasale.com/m-pr.cfm^)|(shareasale.com/u.cfm^)|(apessay.com/.*\\?rid=)|(apessay.com/.*&rid=)|(tatacliq.com/.*\\?cid=af:)|(tatacliq.com/.*&cid=af:)|(thermoworks.com/.*\\?tw=)|(thermoworks.com/.*&tw=)|(zaful.com/.*\\?lkid=)|(zaful.com/.*&lkid=)";
+	return searchPattern.test(url)
 }
 
 function removeBanner() {
@@ -209,9 +185,8 @@ function highlightTitle() {
 
 //second reader
 
-///http redirects -- make the requests yourself
-	// log all urls that you see in this process and match them
-	//mutation observer or mutation summary <-- use these libraries
+//still need to make sure that it loads for all videos and all page loading patterns (for example, does not clear after all the time)
+//tear down correctly shoud fix this
 //settings-- use chrome.storage
 //file a bug saying that client side redirects are not supported
 //inject the javascript into the page as a script tab-- use the MutationSummary.js
