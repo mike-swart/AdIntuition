@@ -58,15 +58,13 @@ function addObserver(){
 		document.lastElementChild.appendChild(marker);
 	}
 	catch(err) {
-		//console.log(err);
 		chrome.runtime.sendMessage({"function": "getMutationSummary"});
 		window.setTimeout(function() {addObserver();}, 20);
 	}
 }
 
 function handleChanges(summaries) {
-	//getOptions();
-	removeBanner();
+	remake();
 	var desc = document.getElementById("description").getElementsByTagName('a');
 	var haveSeenMatch = false;
 	for (var i=0; i<desc.length; i++) {
@@ -79,7 +77,7 @@ function remake() {
 	chrome.runtime.sendMessage({"function": "reset_icon", "icon":"logos/logo.png"});
 	elems = document.getElementById("description").getElementsByTagName('a');
 	for (var i=0; i<elems.length; i++) {
-		elem.style.backgroundColor = "#FFFFFF";
+		elems[i].style.backgroundColor = "#FFFFFF";
 	}
 }
 
@@ -142,9 +140,9 @@ function checkSponsored(index) {
 
 function checkRedirect(url, index) {
 	var xhr = new XMLHttpRequest();
-	console.log(url);
 	xhr.open("GET", SERVER_ADDRESS + url, true);
 	xhr.onload = function() {
+		console.log("code: " + xhr.status + " url: " + url);
 		if (xhr.response === 'true') {
 			//A match was found!!!
 			addBanner("normal");

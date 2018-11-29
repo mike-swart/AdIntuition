@@ -47,5 +47,8 @@ How successfully can we show that there are advertisements on a social media pla
 ### TODO: urls to consider
 https://www.dollarshaveclub.com/MattStonie
 http://audible.com/VERITASIUM
+https://bit.ly/2Bf88sh <-- hello fresh
+
+Need to look into 302 codes more
 
 
