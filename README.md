@@ -31,6 +31,7 @@ How successfully can we show that there are advertisements on a social media pla
 | data/                          | Folder containing the training set for the clustering of videos            |
 | src/data_reader/               | Folder containing the code to read the information in the ../data folder   |
 | src/logos/                     | Folder containing any necessary logos                                      |
+| src/server/                    | Folder containing code to check for url redirects and regex matches        |
 
 | File Name                      | Description                                                                |
 | -----------------              | -----------                                                                | 
@@ -43,10 +44,8 @@ How successfully can we show that there are advertisements on a social media pla
 | src/popup.html                 | The html of the dropdown that pops up when icon is clicked in the upper right hand corner |
 | src/popup.js                   | Allows for the button to be clicked on popup.html                          |
 
+### TODO: urls to consider
+https://www.dollarshaveclub.com/MattStonie
+http://audible.com/VERITASIUM
 
-### Running the server
-In the server directory:
 
-`node server.js`
-`ngrok http 4567`
-Then, you must use the https forwarding link in the getAndChangeBackground.js SERVER_ADDRESS variable

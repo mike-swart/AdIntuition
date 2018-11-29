@@ -1,15 +1,3 @@
-var port = 4567;
-
-const express = require('express')  
-
-const app = express()
-
-function allowCrossDomain(req, res, next) {
-	res.header('Access-Control-Allow-Origin', '*')
-	res.header('Access-Control-Allow-Methods', 'GET,POST')
-	res.header('Access-Control-Allow-Headers', 'Content-Type')
-	next()
-}
 
 //these are on an aws lambda instance now
 function urlMatches(url) {
@@ -21,9 +9,6 @@ function urlMatches(url) {
 
 function checkRedirectsAndMatches(url) {
 	var matches = urlMatches(url);
-	if (matches) {
-		return 200, true;
-	}
 	const { spawnSync } = require( 'child_process' )
 	const response = spawnSync( 'curl', [ '-i','-H','Accept: application/json','-H', 'Content-Type: application/json', '-X', 'GET', url], {shell: true});
 	var output = response.stdout.toString();
@@ -31,30 +16,18 @@ function checkRedirectsAndMatches(url) {
 	lines = output.split(/[\r\n,\r,\n]+/);
 	//the first line will have the response code after the first white space
 	var responseCode = parseInt(lines[0].split(/[\s]+/)[1]);
+	console.log("Code: " + responseCode + "\t\tmatch: " + matches + "\t\turl: " + url);
 	if (responseCode >= 300 && responseCode < 400) {
 		for (var i=1; i<lines.length;i++) {
 			if (lines[i].indexOf("Location") === 0 || lines[i].indexOf("location") === 0) {
 				var newUrl = lines[i].split(/[\s]+/)[1];
-				console.log(newUrl);
-				return checkRedirectsAndMatches(newUrl);
+				checkRedirectsAndMatches(newUrl);
 			}
 		}
 	}
-	return 200, false;
 }
 
-app.use(allowCrossDomain)
-app.use('/', (request, response) => {
-	//expect to be of the form localhost:4567/?url=<insert_url_here>
-	query = request.query;
-	if (query.url) {
-		var redirectExists = checkRedirectsAndMatches(query.url);
-		response.send(redirectExists);
-	}
-})
-app.listen(port, (err) => {  
-	if (err) {
-		return console.log('something bad happened', err)
-	}
-	console.log(`server is listening on ${port}`)
-})
+var url = process.argv[2];
+checkRedirectsAndMatches(url);
+
+//curl -i -H 'Accept: application/json' -H Content-Type: application/json' -X GET <url>
