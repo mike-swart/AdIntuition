@@ -25,7 +25,7 @@ function checkRedirectsAndMatches(url) {
 		return 200, true;
 	}
 	const { spawnSync } = require( 'child_process' )
-	const response = spawnSync( 'curl', [ '-i','-H','Accept: application/json','-H', 'Content-Type: application/json', '-X', 'GET', url], {shell: true});
+	const response = spawnSync( 'curl', [ '-I','-H','Accept: application/json','-H', 'Content-Type: application/json', '-X', 'GET', url], {shell: true});
 	var output = response.stdout.toString();
 	//check for a redirect
 	lines = output.split(/[\r\n,\r,\n]+/);
