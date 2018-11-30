@@ -1,5 +1,7 @@
 var NUM_RETRIES = 5;
 var HIGHLIGHT_COLOR = "#fccdd3";
+//element to highlight. This is the Title Box
+var TITLE_ELEM_ID = "info-contents";
 var SERVER_ADDRESS = "https://ovqz88jgqf.execute-api.us-west-2.amazonaws.com/default/SocialMediaEndorsements?url="
 
 //text constants
@@ -73,8 +75,13 @@ function handleChanges(summaries) {
 }
 
 function remake() {
+	//remove the banner
 	removeBanner();
+	//reset the icon
 	chrome.runtime.sendMessage({"function": "reset_icon", "icon":"logos/logo.png"});
+	//un-highlight video title
+	document.getElementById(TITLE_ELEM_ID).style.backgroundColor = "";
+	//reset any highlighted links
 	elems = document.getElementById("description").getElementsByTagName('a');
 	for (var i=0; i<elems.length; i++) {
 		elems[i].style.backgroundColor = "#FFFFFF";
@@ -160,19 +167,9 @@ function removeBanner() {
 }
 
 function highlightTitle() {
-	//element to highlight. This is the Title Box
-	const ELEM_ID = "info-contents";
-
-	//set the correct color
-	if (document.getElementById(ELEM_ID) !== null && shouldHighlightTitle) { //the element is not yet found
-		document.getElementById(ELEM_ID).style.backgroundColor = HIGHLIGHT_COLOR;
+	if (document.getElementById(TITLE_ELEM_ID) !== null && shouldHighlightTitle) { //the element is not yet found
+		document.getElementById(TITLE_ELEM_ID).style.backgroundColor = HIGHLIGHT_COLOR;
 	}
-	/*if (document.getElementById(ELEM_ID).style.backgroundColor === "" && shouldChange) { //the box is not highlighted but should be
-		document.getElementById(ELEM_ID).style.backgroundColor = color;
-	}
-	else { //the box should not be highlighted
-		document.getElementById(ELEM_ID).style.backgroundColor == "";
-	}*/
 }
 
 

@@ -1,5 +1,11 @@
-# SocialMediaEndorsements
+# AdIntuition
 A Browser Extension to flag affiliate marketing and hopefully sponsored content
+
+### Using the extension
+Steps to test the extension while it is still being developed:
+* Go to [this link](chrome://extensions)
+* Toggle `developer mode` on in the upper right hand corner
+* Click `Load Unpacked` and then select the `src` folder in this directory
 
 
 ### Research Question
@@ -44,11 +50,5 @@ How successfully can we show that there are advertisements on a social media pla
 | src/popup.html                 | The html of the dropdown that pops up when icon is clicked in the upper right hand corner |
 | src/popup.js                   | Allows for the button to be clicked on popup.html                          |
 
-### TODO: urls to consider
-https://www.dollarshaveclub.com/MattStonie
-http://audible.com/VERITASIUM
-https://bit.ly/2Bf88sh <-- hello fresh
-
-Need to look into 302 codes more
 
 

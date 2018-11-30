@@ -15,7 +15,8 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 		var sound = new Audio();
 		sound.src = 'beat2.wav';
 		sound.play();
-		window.setTimeout(function() {sound.play();}, 500);
+		//uncomment this to play 2 beeps instead of 1
+		//window.setTimeout(function() {sound.play();}, 500);
 	}
 	else if (message.function === "reset_icon") {
 		chrome.browserAction.setBadgeText({"text": "", "tabId": sender.tab.id});
