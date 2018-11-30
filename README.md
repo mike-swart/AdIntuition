@@ -3,7 +3,7 @@ A Browser Extension to flag affiliate marketing and hopefully sponsored content
 
 ### Using the extension
 Steps to test the extension while it is still being developed:
-* Go to [this link](chrome://extensions)
+* Go to `chrome://extensions`
 * Toggle `developer mode` on in the upper right hand corner
 * Click `Load Unpacked` and then select the `src` folder in this directory
 
