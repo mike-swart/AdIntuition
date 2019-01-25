@@ -7,8 +7,36 @@ function urlMatches(url) {
 	return searchPattern.test(url);
 }
 
-function checkRedirectsAndMatches(url) {
+//these are on an aws lambda instance now
+function urlUtmMatches(url) {
+	//check in the ../extra directory to see how we got this string
+	//"There is a business relationship between the content creator"
+	const str = "((utm_source=.*)|(utm_term=.*)|(utm_campaign=.*)|(utm_content=.*)|(utm_medium=.*)){4}"
+	var searchPattern = new RegExp(str);
+	return searchPattern.test(url);
+}
+
+function checkRedirectsAndMatches(prevUrl, newUrl) {
+	var url = newUrl;
+	if (url.substring(0,1) == "/") {
+		if (prevUrl === "") {
+			//this is the first time
+			return false
+		} 
+		var searchPattern = new RegExp("http[s]?:\/\/[^\/\s]*\.[^\/\s]*\.[^\/\s][^\/\s][^\/\s]?\/");
+		var temp = prevUrl.split(searchPattern);
+		if (!temp) {
+			url = prevUrl + newUrl;
+		}
+		else if (temp.length === 1) {
+			url = prevUrl.substring(0, prevUrl.length-1) + newUrl;
+		}
+		else {
+			url = prevUrl.substring(0, prevUrl.length-temp[1].length-1) + newUrl;
+		}
+	}
 	var matches = urlMatches(url);
+	var utmmatches = urlUtmMatches(url);
 	const { spawnSync } = require( 'child_process' )
 	const response = spawnSync( 'curl', [ '-I','-H','Accept: application/json','-H', 'Content-Type: application/json', '-X', 'GET', url], {shell: true});
 	var output = response.stdout.toString();
@@ -16,18 +44,18 @@ function checkRedirectsAndMatches(url) {
 	lines = output.split(/[\r\n,\r,\n]+/);
 	//the first line will have the response code after the first white space
 	var responseCode = parseInt(lines[0].split(/[\s]+/)[1]);
-	console.log("Code: " + responseCode + "\t\tmatch: " + matches + "\t\turl: " + url);
+	console.log("Code: " + responseCode + "\t\tmatch: " + matches + " " + utmmatches + "\t\turl: " + url);
 	if (responseCode >= 300 && responseCode < 400) {
 		for (var i=1; i<lines.length;i++) {
 			if (lines[i].indexOf("Location") === 0 || lines[i].indexOf("location") === 0) {
 				var newUrl = lines[i].split(/[\s]+/)[1];
-				checkRedirectsAndMatches(newUrl);
+				checkRedirectsAndMatches(url, newUrl);
 			}
 		}
 	}
 }
 
 var url = process.argv[2];
-checkRedirectsAndMatches(url);
+checkRedirectsAndMatches("", url);
 
 //curl -I -H "Accept: application/json" -H "Content-Type: application/json" -X GET <url>

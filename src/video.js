@@ -173,12 +173,27 @@ function highlightTitle() {
 }
 
 
+//search/influencer page
+//coupon codes and promo codes
+//	predictive model to get the coupon code out-- have some predictive model (potential future improvement)
+	//dictionary approach-- create a set of coupon codes from the user name and all permuations (initials, first couple letters, nicknames, dictionary of synonyms)
+//utm source
+//irb
+//prepare for a sample -- give them a questionaire and fill the form out
+		// give them a diary study for 2 weeks
+		//log the data for videos watched, number of times a banner popped up
+		//allow a unique code
+
+//technology probes
+//this is just one instantiation of a platform that can help people detect ads
+//The techniques are generalizable-- does not have to be an extension 
+
+//deception task
+
+
+
 //second reader
 
-//still need to make sure that it loads for all videos and all page loading patterns (for example, does not clear after all the time)
-//tear down correctly shoud fix this
-//settings-- use chrome.storage
-//file a bug saying that client side redirects are not supported
 //inject the javascript into the page as a script tab-- use the MutationSummary.js
 	// --make sure that Youtube is not changing the DOM constantly
 
@@ -197,4 +212,10 @@ function highlightTitle() {
 //use a very barebones 
 
 //storage or cache
+
+
+//dictionary
+//username, firstname, lastname
+//can look for "code", "off", "promotion", "%", "use"
+//pair words and codes
 
