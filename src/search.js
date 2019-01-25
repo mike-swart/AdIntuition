@@ -80,23 +80,27 @@ function checkVideo(video, index) {
 		var desc = this.response.items[0].snippet.description;
 		var urls = getUrlsFromDescriptionString(desc);
 		for (var i=0; i< urls.length; i++) {
-			checkRedirect(urls[i], index);
+			checkRedirect(urls[i], vid);
 		}
 	}
 	xhr.responseType = "json";
 	xhr.send();
 }
 
-function checkRedirect(url, index) {
+function checkRedirect(url, vid) {
 	var xhr = new XMLHttpRequest();
 	xhr.open("GET", SERVER_ADDRESS + url, true);
 	xhr.onload = function() {
-		// console.log("code: " + xhr.status + " url: " + url);
-		// console.log(xhr.response);
 		if (xhr.response === 'true') {
-			console.log("here at index" + index);
-			console.log(document.getElementsByTagName("ytd-thumbnail"));
-			document.getElementsByTagName("ytd-thumbnail")[index].parentNode.style.backgroundColor = HIGHLIGHT_COLOR;
+			//console.log("here at index" + index);
+			// console.log(document.getElementsByTagName("ytd-thumbnail"));
+			var parentNode = vid.parentNode
+			//the difference is small (means that it is close in distance and therefore just the general parent node)
+			if (parentNode.compareDocumentPosition(document.getElementsByTagName("ytd-thumbnail")[0]) < 5) {
+				//the description of the video in the list
+				parentNode.childNodes[3].childNodes[3].style.backgroundColor = HIGHLIGHT_COLOR;
+				//parentNode.childNodes[1].childNodes[0].style.backgroundColor = HIGHLIGHT_COLOR;
+			}
 		}
 	}
 	xhr.send();
