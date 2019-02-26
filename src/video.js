@@ -3,6 +3,7 @@ var HIGHLIGHT_COLOR = "#fccdd3";
 //element to highlight. This is the Title Box
 var TITLE_ELEM_ID = "info-contents";
 var SERVER_ADDRESS = "https://ovqz88jgqf.execute-api.us-west-2.amazonaws.com/default/SocialMediaEndorsements?url="
+var TEST_ENSURE_ADDRESS = "https://lj71toig7l.execute-api.us-west-2.amazonaws.com/default/AdIntuitionTracker?user="
 
 //text constants
 var BANNER_NORMAL = "AdIntuition detected a sponsorship in this video";
@@ -20,7 +21,32 @@ var shouldHighlightURL = true;
 var shouldHighlightTitle = false;
 var shouldPlaySound = false;
 var shouldShowDesktopNotification = false;
+var turk_id = ""
 
+function checkMTurkID() {
+	chrome.storage.sync.get({
+		mturkID: null,
+	}, function(items) {
+		var id = items.mturkID;
+		if (id === null) {
+			var inputId = prompt("Please enter your Mechanical Turk ID", "abcd1234");
+			chrome.storage.sync.set({
+				mturkID: inputId,
+			}, function() {
+				turk_id = inputId;
+				var xhr = new XMLHttpRequest();
+				xhr.open("GET", TEST_ENSURE_ADDRESS + turk_id + "&action=userAdd", true);
+				xhr.send();
+				console.log('saved mturkID ' + inputId);
+			});
+		}
+		else {
+			turk_id = id;
+		}
+	})
+}
+
+checkMTurkID();
 run();
 
 function run() {
@@ -46,6 +72,7 @@ function getOptions() {
 	});
 }
 
+//bug when go to a video with no links-- then does not breakdown the bar
 function addObserver(){
 	try {
 		var observer = new MutationSummary({
@@ -67,6 +94,15 @@ function addObserver(){
 
 function handleChanges(summaries) {
 	remake();
+	var xhr = new XMLHttpRequest();
+	searchTerm = "watch?v="
+	fullUrl = window.location.href
+	urlEnding = fullUrl.substring(fullUrl.indexOf(searchTerm)+searchTerm.length)
+	xhr.open("GET", TEST_ENSURE_ADDRESS + turk_id + "&action=vidAdd&video=" + urlEnding, true);
+	xhr.onload = function() {
+		console.log(urlEnding);
+	}
+	xhr.send()
 	var desc = document.getElementById("description").getElementsByTagName('a');
 	var haveSeenMatch = false;
 	for (var i=0; i<desc.length; i++) {
@@ -128,17 +164,6 @@ function addBanner(bannerType) {
 	highlightTitle();
 }
 
-function rotateIcon(stateNum) {
-	if (stateNum === 41) {
-		return
-	}
-	const icons = ["logos/logo.png", "logos/logo1.png", "logos/logo2.png", "logos/logo3.png"];
-	window.setTimeout(function() {
-		chrome.runtime.sendMessage({"function": "change_icon", "icon": icons[stateNum%4]});
-		rotateIcon(stateNum+1);
-	}, 500);
-}
-
 function checkSponsored(index) {
 	document.getElementById("description").getElementsByTagName('a')[index].style.backgroundColor = "#FFFFFF";
 	var url = document.getElementById("description").getElementsByTagName('a')[index].innerHTML;
@@ -171,51 +196,4 @@ function highlightTitle() {
 		document.getElementById(TITLE_ELEM_ID).style.backgroundColor = HIGHLIGHT_COLOR;
 	}
 }
-
-
-//search/influencer page
-//coupon codes and promo codes
-//	predictive model to get the coupon code out-- have some predictive model (potential future improvement)
-	//dictionary approach-- create a set of coupon codes from the user name and all permuations (initials, first couple letters, nicknames, dictionary of synonyms)
-//utm source
-//irb
-//prepare for a sample -- give them a questionaire and fill the form out
-		// give them a diary study for 2 weeks
-		//log the data for videos watched, number of times a banner popped up
-		//allow a unique code
-
-//technology probes
-//this is just one instantiation of a platform that can help people detect ads
-//The techniques are generalizable-- does not have to be an extension 
-
-//deception task
-
-
-
-//second reader
-
-//inject the javascript into the page as a script tab-- use the MutationSummary.js
-	// --make sure that Youtube is not changing the DOM constantly
-
-//Make a schedule for when you want things done
-// -- steps and when we want them done
-//Step 1-- get affiliate marketing part done
-//Search results, settings, etc.-- would also do this through loading each video, looking at html and then checking each url redirect-- if there is a thing return
-//notify when done
-
-//rule list parsers-- feed it the regex list and it will give you a parser
-
-//make sure that any redirect does not load as a click-- this could be seen as click-farming- fraudalant
-// do not lead to false clicks-- only check for header redirects
-//make sure you are not actually setting headers-- this could set cookies, which could be illegal
-//send some hardcoded useragent-- do not use the browser's user data
-//use a very barebones 
-
-//storage or cache
-
-
-//dictionary
-//username, firstname, lastname
-//can look for "code", "off", "promotion", "%", "use"
-//pair words and codes
 

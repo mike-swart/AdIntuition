@@ -1,7 +1,7 @@
 var NUM_RETRIES = 5;
 var HIGHLIGHT_COLOR = "#fccdd3";
 var SERVER_ADDRESS = "https://ovqz88jgqf.execute-api.us-west-2.amazonaws.com/default/SocialMediaEndorsements?url="
-var OAUTH_CLIENT = "AIzaSyDTsjsoSs-c9ygvEQvxx6iTqdgTO6M-C0M"
+var OAUTH_CLIENT = "" //Youtube API Key goes here
 var totalVids = 0
 
 

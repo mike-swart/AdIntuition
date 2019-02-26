@@ -8,7 +8,7 @@
   },
   "permissions": ["activeTab", "tabs", "webNavigation", "notifications", "storage", "*://*/"],
   "browser_action": {
-    "default_icon": "logos/edit1.png",
+    "default_icon": "logos/logo.png",
     "default_title": "Information about AdIntuition",
     "default_popup": "popup.html"
   },
@@ -18,13 +18,13 @@
       "js": ["video.js"],
       "css": ["common.css"],
       "run_at": "document_start"
-    },
-    {
-      "matches": ["*://www.youtube.com/results?*"],
-      "js": ["search.js"],
-      "css": ["common.css"],
-      "run_at": "document_start"
     }
+    // {
+    //   "matches": ["*://www.youtube.com/results?*"],
+    //   "js": ["search.js"],
+    //   "css": ["common.css"],
+    //   "run_at": "document_start"
+    // }
   ],
   "options_page": "options.html",
   "icons": {
