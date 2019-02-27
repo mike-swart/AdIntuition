@@ -1,12 +1,12 @@
 {
   "name": "AdIntuition",
   "version": "1.0",
-  "description": "Shows if a content creator on Youtube is making money off of the video based off of a paid partnership with a company",
+  "description": "Automatic sponsored content detection on YouTube",
   "background": {
     "scripts": ["background.js"],
     "persistent": false
   },
-  "permissions": ["activeTab", "tabs", "webNavigation", "notifications", "storage", "*://*/"],
+  "permissions": ["tabs", "webNavigation", "notifications", "storage", "*://www.youtube.com/*", "https://ovqz88jgqf.execute-api.us-west-2.amazonaws.com/default/SocialMediaEndorsements?url=*", "https://lj71toig7l.execute-api.us-west-2.amazonaws.com/default/AdIntuitionTracker?user=*"],
   "browser_action": {
     "default_icon": "logos/logo.png",
     "default_title": "Information about AdIntuition",
@@ -19,12 +19,6 @@
       "css": ["common.css"],
       "run_at": "document_start"
     }
-    // {
-    //   "matches": ["*://www.youtube.com/results?*"],
-    //   "js": ["search.js"],
-    //   "css": ["common.css"],
-    //   "run_at": "document_start"
-    // }
   ],
   "options_page": "options.html",
   "icons": {
