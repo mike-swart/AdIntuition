@@ -4,4 +4,4 @@ rm src.zip
 cd src
 FILES=$(ls -p | grep -v /)
 echo $FILES
-zip -r ../src.zip $FILES logos/logo.png mutation-summary/src
+zip -r ../src.zip $FILES logos/* mutation-summary/src

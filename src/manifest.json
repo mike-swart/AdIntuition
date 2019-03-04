@@ -1,12 +1,12 @@
 {
   "name": "AdIntuition",
-  "version": "1.0",
+  "version": "1.1.0.1",
   "description": "Automatic sponsored content detection on YouTube",
   "background": {
     "scripts": ["background.js"],
     "persistent": false
   },
-  "permissions": ["tabs", "webNavigation", "notifications", "storage", "*://www.youtube.com/*", "https://ovqz88jgqf.execute-api.us-west-2.amazonaws.com/default/SocialMediaEndorsements?url=*", "https://lj71toig7l.execute-api.us-west-2.amazonaws.com/default/AdIntuitionTracker?user=*"],
+  "permissions": ["activeTab", "notifications", "storage", "*://www.youtube.com/*", "https://*.execute-api.us-west-2.amazonaws.com/default/*"],
   "browser_action": {
     "default_icon": "logos/logo.png",
     "default_title": "Information about AdIntuition",
@@ -24,7 +24,7 @@
   "icons": {
     "16": "logos/logo.png",
     "48": "logos/logo.png",
-    "128": "logos/logo.png"
+    "128": "logos/logo128x128.png"
   },
   "manifest_version": 2
 }

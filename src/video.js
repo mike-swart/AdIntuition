@@ -22,6 +22,7 @@ var shouldHighlightTitle = false;
 var shouldPlaySound = false;
 var shouldShowDesktopNotification = false;
 var turk_id = ""
+var shouldLog = false;
 
 function checkMTurkID() {
 	chrome.storage.sync.get({
@@ -29,21 +30,44 @@ function checkMTurkID() {
 	}, function(items) {
 		var id = items.mturkID;
 		if (id === null) {
-			var inputId = prompt("Please enter your Mechanical Turk ID", "abcd1234");
-			chrome.storage.sync.set({
-				mturkID: inputId,
-			}, function() {
-				turk_id = inputId;
-				var xhr = new XMLHttpRequest();
-				xhr.open("GET", TEST_ENSURE_ADDRESS + turk_id + "&action=userAdd", true);
-				xhr.send();
-				console.log('saved mturkID ' + inputId);
-			});
+			if (confirm("Are you participating in the user study? Press \"Ok\" if yes")) {
+				shouldLog = true;
+				var inputId = prompt("Please enter your Mechanical Turk ID", "abcd1234");
+				chrome.storage.sync.set({
+					mturkID: inputId,
+				}, function() {
+					turk_id = inputId;
+					logMturkWatch("userAdd");
+				});
+			}
+			else {
+				shouldLog = false;
+				chrome.storage.sync.set({
+					mturkID: "notParticipating",
+				}, function() {
+					turk_id = inputId;
+				});
+			}
 		}
 		else {
 			turk_id = id;
 		}
 	})
+}
+
+function logMturkWatch(actionStr) {
+	if (shouldLog) {
+		var xhr = new XMLHttpRequest();
+		searchTerm = "watch?v="
+		fullUrl = window.location.href
+		urlEnding = fullUrl.substring(fullUrl.indexOf(searchTerm)+searchTerm.length)
+		xhr.open("GET", TEST_ENSURE_ADDRESS + turk_id + "&action=" + actionStr +"&video=" + urlEnding, true);
+		xhr.onload = function() {
+			console.log(urlEnding + " sent to server");
+
+		}
+		xhr.send()
+	}
 }
 
 checkMTurkID();
@@ -94,15 +118,7 @@ function addObserver(){
 
 function handleChanges(summaries) {
 	remake();
-	var xhr = new XMLHttpRequest();
-	searchTerm = "watch?v="
-	fullUrl = window.location.href
-	urlEnding = fullUrl.substring(fullUrl.indexOf(searchTerm)+searchTerm.length)
-	xhr.open("GET", TEST_ENSURE_ADDRESS + turk_id + "&action=vidAdd&video=" + urlEnding, true);
-	xhr.onload = function() {
-		console.log(urlEnding);
-	}
-	xhr.send()
+	logMturkWatch("vidWatch");
 	var desc = document.getElementById("description").getElementsByTagName('a');
 	var haveSeenMatch = false;
 	for (var i=0; i<desc.length; i++) {
@@ -151,6 +167,9 @@ function addBanner(bannerType) {
 	bannerButton.innerHTML = bannerConstants.button
 	bannerButton.onclick = (function() {removeBanner();})
 	document.getElementById("AdIntuition").appendChild(bannerButton);
+
+	//send videoShown
+	logMturkWatch("bannerShown");
 
 	//NOTE: Any currently open tabs will need to be refreshed
 	if (!shouldShowBanner) { //use settings
