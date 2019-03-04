@@ -1,3 +1,4 @@
 *.DS_Store
 *.ipynb_checkpoints
 *.zip
+server/node_modules
