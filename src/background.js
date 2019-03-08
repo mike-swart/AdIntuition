@@ -6,6 +6,9 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 	else if (message.function === "getMutationSummary") {
 		chrome.tabs.executeScript(sender.tab.id, {file: 'mutation-summary/src/mutation-summary.js'});
 	}
+	else if (message.function === "getCouponFinder") {
+		chrome.tabs.executeScript(sender.tab.id, {file: 'couponFinder.js'});
+	}
 	else if (message.function === "change_icon") {
 		chrome.browserAction.setBadgeText({"text": "open", "tabId": sender.tab.id});
 		chrome.browserAction.setBadgeBackgroundColor({"color": "#cfd1b1", "tabId": sender.tab.id});
