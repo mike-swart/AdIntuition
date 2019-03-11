@@ -7,11 +7,16 @@ var SERVER_ADDRESS = "https://ovqz88jgqf.execute-api.us-west-2.amazonaws.com/def
 var TEST_ENSURE_ADDRESS = "https://lj71toig7l.execute-api.us-west-2.amazonaws.com/default/AdIntuitionTracker?user="
 
 //text constants
-var BANNER_NORMAL = "AdIntuition detected a sponsorship in this video";
-var BUTTON_NORMAL = "Exit";
-var BANNER_OPTIONS = {
+const BANNER_NORMAL = "This video contains affiliate links. If you click on highlighted links, the creator recieves a small commission";
+const BANNER_COUPON = "This video may contain affiliate content. Check the highlighted portions in the description";
+const BUTTON_NORMAL = "Exit";
+const BANNER_OPTIONS = {
 	"normal": {
 		"text": BANNER_NORMAL,
+		"button": BUTTON_NORMAL,
+	},
+	"coupon": {
+		"text": BANNER_COUPON,
 		"button": BUTTON_NORMAL,
 	},
 }
@@ -132,6 +137,7 @@ function handleChanges(summaries) {
 function remake() {
 	//remove the banner
 	removeBanner();
+	removeCouponBanner();
 	//un-highlight video title
 	document.getElementById(TITLE_ELEM_ID).style.backgroundColor = "";
 	//reset any highlighted links
@@ -159,6 +165,9 @@ function addBanner(bannerType) {
 		if (document.getElementById("AdIntuition") !== null) {
 			return;
 		}
+		if (document.getElementById("AdIntuitionCoupon") !== null) {
+			removeCouponBanner();
+		}
 		const bannerConstants = BANNER_OPTIONS[bannerType];
 		var banner = document.createElement("div");
 		banner.innerHTML = "<div id='AdIntuition' style='background-color:" + HIGHLIGHT_COLOR + "; text-align:right; padding-right:10px; padding-bottom:1px; padding-top:1px;'>"+ bannerConstants.text + "&nbsp&nbsp</div>";
@@ -184,37 +193,36 @@ function addBanner(bannerType) {
 		showDesktopNotification();
 		highlightTitle();
 	}
-	//need to add a banner for the coupon codes
-	// else if (bannerType === "normal") {
-	// 	//in case banner is not selected in settings, add another invisible tag
-	// 	if (document.getElementById("AdIntuition") !== null) {
-	// 		return;
-	// 	}
-	// 	const bannerConstants = BANNER_OPTIONS[bannerType];
-	// 	var banner = document.createElement("div");
-	// 	banner.innerHTML = "<div id='AdIntuition' style='background-color:" + HIGHLIGHT_COLOR + "; text-align:right; padding-right:10px; padding-bottom:1px; padding-top:1px;'>"+ bannerConstants.text + "&nbsp&nbsp</div>";
-	// 	element = document.getElementById("masthead");
-	// 	element.parentNode.insertBefore(banner, element.nextSibling);
-	// 	var bannerButton = document.createElement("a");
-	// 	bannerButton.classList.add("bannerbutton");
-	// 	bannerButton.innerHTML = bannerConstants.button
-	// 	bannerButton.onclick = (function() {removeBanner();})
-	// 	document.getElementById("AdIntuition").appendChild(bannerButton);
+	else if (bannerType === "coupon") {
+		//in case banner is not selected in settings, add another invisible tag
+		if (document.getElementById("AdIntuition") !== null || document.getElementById("AdIntuitionCoupon") !== null) {
+			return;
+		}
+		const bannerConstants = BANNER_OPTIONS[bannerType];
+		var banner = document.createElement("div");
+		banner.innerHTML = "<div id='AdIntuitionCoupon' style='background-color:" + COUPON_HIGHLIGHT_COLOR + "; text-align:right; padding-right:10px; padding-bottom:1px; padding-top:1px;'>"+ bannerConstants.text + "&nbsp&nbsp</div>";
+		element = document.getElementById("masthead");
+		element.parentNode.insertBefore(banner, element.nextSibling);
+		var bannerButton = document.createElement("a");
+		bannerButton.classList.add("bannerbutton");
+		bannerButton.innerHTML = bannerConstants.button
+		bannerButton.onclick = (function() {removeCouponBanner();})
+		document.getElementById("AdIntuitionCoupon").appendChild(bannerButton);
 
-	// 	//send videoShown
-	// 	logMturkWatch("bannerShown");
+		//send videoShown
+		logMturkWatch("bannerShown");
 
-	// 	//NOTE: Any currently open tabs will need to be refreshed
-	// 	if (!shouldShowBanner) { //use settings
-	// 		document.getElementById("AdIntuition").style.display = "none";
-	// 	}
-	// 	else {
-	// 		document.getElementById("AdIntuition").style.display = "block";
-	// 	}
-	// 	playSound();
-	// 	showDesktopNotification();
-	// 	highlightTitle();
-	// }
+		//NOTE: Any currently open tabs will need to be refreshed
+		if (!shouldShowBanner) { //use settings
+			document.getElementById("AdIntuitionCoupon").style.display = "none";
+		}
+		else {
+			document.getElementById("AdIntuitionCoupon").style.display = "block";
+		}
+		playSound();
+		showDesktopNotification();
+		highlightTitle();
+	}
 }
 
 function checkSponsored(index) {
@@ -227,7 +235,7 @@ function checkRedirect(url, index) {
 	var xhr = new XMLHttpRequest();
 	xhr.open("GET", SERVER_ADDRESS + url, true);
 	xhr.onload = function() {
-		console.log("code: " + xhr.status + " url: " + url);
+		//console.log("code: " + xhr.status + " url: " + url);
 		if (xhr.response === 'true') {
 			//A match was found!!!
 			addBanner("normal");
@@ -244,6 +252,13 @@ function removeBanner() {
     }
 }
 
+function removeCouponBanner() {
+	var element = document.getElementById("AdIntuitionCoupon");
+	if (element) {
+    	element.parentNode.removeChild(element);
+    }
+}
+
 function highlightTitle() {
 	if (document.getElementById(TITLE_ELEM_ID) !== null && shouldHighlightTitle) { //the element is not yet found
 		document.getElementById(TITLE_ELEM_ID).style.backgroundColor = HIGHLIGHT_COLOR;
@@ -251,21 +266,14 @@ function highlightTitle() {
 }
 
 function stripLinksFromDesc(descString) {
-	//take out the beginning and ending
-	descString = descString.substring(descString.indexOf(">")+1, descString.length-"</yt-formatted-string>".length);
-
-	//clear of all links
-	var linkElementStart = '<a class="yt-simple-endpoint style-scope yt-formatted-string"'
-	var linkElementEnd = '</a>'
-	var searchPatternStart = new RegExp(linkElementStart);
-	var searchPatternEnd = new RegExp(linkElementEnd);
-	var startHitIndex = descString.search(searchPatternStart);
-	while (startHitIndex > -1) {
-		var endHitIndex = descString.substring(startHitIndex).search(searchPatternEnd);
-		descString = descString.substring(0, startHitIndex) + "\n" + descString.substring(startHitIndex+endHitIndex+linkElementEnd.length+1);
-		startHitIndex = descString.search(searchPatternStart);
-	}
+	//replace with a newline so that each side will be counted as a different sentence
+	descString = descString.replace(/<a class="yt-simple-endpoint style-scope yt-formatted-string.*<\/a>/g, '\n');
 	return descString;
+}
+
+//load it later because the page is not yet done loading
+async function asyncCallAddBanner() {
+	setTimeout(() => {addBanner("coupon");}, 2000);
 }
 
 function checkForCouponCodes() {
@@ -290,6 +298,7 @@ function checkForCouponCodes() {
 			var endPos = startPos + sentences[i].length
 			var newFinal = newDescString.substring(0, startPos) + highlightSentence + newDescString.substring(endPos);
 			document.getElementById('description').children[0].innerHTML = newFinal;
+			asyncCallAddBanner();
 		}
 	}
 }

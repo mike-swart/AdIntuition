@@ -1,5 +1,37 @@
-const CouponWeights = [-0.01133307459128652522, -0.00005033225226581488, -0.00178007218021877778, -0.00059335739340625926, 0, -0.02143708595085109039, 0.02292056916521977711, -0.01202593541082863822, -0.00015815478212168749, -0.01144465641794882062, -0.00016162872746363260, 0.25000000000000000000, 0, -0.01687450081455578108, 0.07462774957779809426, 0, 0, -0.01446572764845837841, 0, 0, -0.00053794889701269666, 0, 0, 0, -0.00022394050624378417, 0, -0.00014789153290095843, 0, 0, -0.01409815910525060063, 0, -0.04393926897716921021, 0, 0.07440288499494129848, 0.00477858503393171347, 0, 0, 0.07448499259727692223, 0, 0, -0.00008397920226222225, 0, -0.00119910877249944218, 0, -0.00926863673439326519, 0, 0, 0, -0.00906413876715684783, 0, 0.10000000000000000555, -0.00747129199549090642, 1.92506302314221211525, -0.00114953064930406294, -0.00013243462347404394, 0, 0, 0, 0, -0.00021562148432963113, 0.01848660507500687195, 0.07465933245286816844, -0.00032094354452042936, -0.05000000000000000278, -0.05000000000000000278, -0.00005033225226599297, -0.02143708595085109039, 0.07449327438319908179, -0.00028088501551096033, -0.01871054558125073361, 0, -0.00792702976728430590, -0.00114953064930406294, -0.00912613853978374787, -0.00941339999430335084, -0.00024973319257323262, 0.03417444484143839639, 0, 0, -0.00014789153290095843, -0.00179734473890235855, -0.00249349618549446830, 0, -0.01880483853411890616, -0.00021709442922887394, 0, 0, 0.00635549394283317637, 0.05000000000000000278, 0, -0.00008590595380888327, -0.00934901972893392719, 0, 0.00029041956289265012, 0, 0.00032742337288247693, 0, -0.00047627759017703636, -0.00754485437477692578, -0.00942727171757029407, -0.00941339999430335084, -0.04309548394678079652, 0, -0.00114953064930406294, -0.05000000000000000278, -0.00469689360186592401, 0, -0.05000000000000000278, 0.02782727946439728095, 0, 0, -0.00032742337288276489, 0, 0, -0.00239821754499888436, 0, -0.00439521162599358119, -0.05000000000000000278, -0.05000000000000000278, 0, -0.00020971661459995294, -0.01471578478728733340, -0.00032094354452043283, -0.00775691511839723957, -0.00046563962250224133, -0.00179734473890235855, -0.01423844265678952600, 0, 0, 0, 0, 0, -0.04393926897716921021, -0.01494258399098181284, 0, -0.00059335739340625926, 0, -0.00051586625564296407, 0, -0.00023800226340574271, -0.01383191688251397301, -0.00005033225226581488, -0.01357985310957030879, -0.00021562148432963113, -0.02890837794634198987, -0.00119910877249944218, -0.02143708595085109039, -0.01279684880324574205, 0, 0, -0.02505033225226581742, 0, -0.00030006544483904751, -0.00014789153290095843, -0.02841412466960557826, 0.01343292640871777965, 0, -0.00827774106826623113, 0, -0.00190171544049911462, -0.00521497452532040506, 0, -0.01392765085132775110, 0, 0.00003983990481143482, 0.07460211960584507696, -0.00780724737066305473, -0.00005054071750373867, -0.00021562148432963113, -0.05000000000000000278, 0.00024145913189922274, 0, 0.01113906241797982255, 0, -0.00054774539563972539, -0.00934901972893392892, -0.01284526815462402535, -0.00071476800716888393, 0.02500000000000000139, -0.02263456312433077822, -0.00617547988634319957, -0.02841412466960557826, 0.01278769114285311856, 0, -0.00018873609989559365, -0.03204756053105912994, 0, 0.02563032880722900669, 0, -0.00044708089110809566, -0.00119910877249944218, -0.00133955726196383139, 0, -0.00179734473890235855, -0.00044388744508995953, -0.02961323344210502195, 0, 0, -0.01408153617682477050, 0, 0, -0.00518483371590961958, -0.00551677581459498589, -0.01190244389488734865, 0.01665745937946153110, -0.00119910877249944218, -0.00044388744508995953, 0, -0.00000000000000079277, 0.02649615237831456221, -0.05000000000000000278, -0.00016162872746363260, -0.00038539000698948646, -0.05000000000000000278, 0.07477520510915611207, -0.02705538742309889638, -0.00190171544049911310, 0, -0.00617547988634319957, 0.01385224288778070384, -0.00775691511839723957, -0.00119910877249944218, -0.01529192163715111484, 0, 0, 0, -0.00119910877249944218, 0, -0.05854030490094414008];
-const CouponFeatures = ["al","also","anim","anyth","archiv","area","around","auto","avail","a","check","checkout","click","contact","discount","facebook","follow","for","googl","hey","how","i","if","in","instagram","like","mi","music","subscrib","the","thi","to","twitter","use","we","xbox","you","zip","band","best","blue","bmw","busi","call","car","center","challeng","chang","channel","check","checkout","choos","code","collect","com","come","comment","commun","compani","contact","control","coupon","cover","creat","custom","day","dealership","discount","download","easi","edit","english","enjoy","entertain","equip","etc","everi","expect","experi","facebook","famili","featur","film","find","first","follow","ford","free","freek","friend","full","game","gamerzgrip","get","give","go","googl","great","group","guy","head","help","home","hope","hous","i'm","includ","india","inform","instal","itani","join","kid","kontrol","latest","leagu","learn","let","level","life","light","like","line","link","list","littl","live","long","look","lot","love","made","make","market","media","meet","mike","movi","much","music","name","nation","near","need","new","news","nissan","offici","og","old","one","order","origin","page","part","peopl","perform","play","player","pleas","present","price","pro","produc","product","promo","provid","purchas","real","record","red","releas","relief","repair","report","review","run","sale","save","school","see","seri","serv","servic","shop","show","song","sound","south","special","sport","spring","stock","stop","store","stori","subscrib","super","support","sure","take","talk","team","time","today","top","toy","toyota","track","trick","tv","twitter","two","us","use","video","visit","vs","want","watch","way","weather","websit","well","without","work","world","year","youtub"];
+const CouponWeights = [-0.00004024931794063161, -0.00010751554319488044, -0.00004024931794063161, -0.00010013418298060461, 0.06317326467600226092, -0.00004849033516842100, -0.00016121731910465363, -0.00022428489804823953, -0.00414943683253530225, -0.00196938132587157330, -0.48280156293920778454, 0.06325285757728138503, 2.06319940055031603166, -0.00196938132587157330, 2.06303345003142091230, 1.85015223272053264125, 0.27713251413690170866, 0.06287894267645621760, 0.21305005355398237699, -0.00009745635220902041, -0.00004432204447751592, -0.00016121731910465363, -0.00522407494479172532, -1.00000000000000000000, -0.00004024931794063161, -1.00000000000000000000, -0.03137956739307986437, -0.00010013418298060461, 0.06315151856053347057, -0.33984266037397325988, 0.08067820323181328079, 0.06278289495700138667, -0.01044814988958345063, 0.06321178855180320522, -0.00009745635220902041, -0.00020384265051222222, -0.09711063275968855046, -0.08965651952528118362, -0.00004432204447751592, -0.00004024931794063161, -0.00986614921021462116, -0.01764809886606554315, -0.00004432204447751592, -0.00789676788434304743, 0.06327300884958853011, -0.09711063275968855046, -0.00004702572664523619, -0.00937351177732702670, -0.01567222483437517508, -0.00009745635220902041, -0.07146004546262424428, -0.00004432204447751592, -0.11661325605548721052, -0.03137956739307986437, -0.00522407494479172532, 0.06329927934533863265, -0.09711063275968855046, -0.46267455828353232228, -0.00009745635220902041, 0.45138112019019904775, -0.46267455828353232228, -0.45150824705011238791, 0.06291308866960682034, -0.00196938132587157330, -0.00004024931794063161, -0.00522407494479172532, -0.00004024931794063161, -0.07146004546262424428, -0.00009698067033684201, -0.00009745635220902041, -1.00000000000000000000, 0.00026463554294342551, -1.00000000000000000000, 0.02695673653020602342, -0.00522407494479172532, -0.46267455828353232228, -0.00414943683253530225, 0.20633509751246847941, -0.00004432204447751592, -0.46267455828353232228, -0.09711063275968855046, -0.00196938132587157330];
+const CouponFeatures = ["access","also","audio","auto","available","best","bmw","call","case","channel","cheap","check","checkout","click","code","codes","coupon","day","discount","download","easy","exclusive","experience","fair","features","fifa","food","ford","free","game","get","go","great","help","high","honda","house","join","learn","like","live","making","many","media","microsoft","mix","music","new","nissan","official","old","phone","player","pop","price","psn","radio","read","release","save","show","site","store","subscribe","system","team","touch","toys","traffic","tv","us","use","used","using","vehicle","video","wa","want","way","without","world","youtube"];
+
+const stopwords = ["i", "me", "my", "myself" , "we" , "our" , "ours" , "ourselves" , "you" , "you're" , "you've" , "you'll" , "you'd" , "your" , "yours" , "yourself" , "yourselves" , "he" , "him" , "his" , "himself" , "she" , "she's" , "her" , "hers" , "herself" , "it" , "it's" , "its" , "itself" , "they" , "them" , "their" , "theirs" , "themselves" , "what" , "which" , "who" , "whom" , "this" , "that" , "that'll" , "these" , "those" , "am" , "is" , "are" , "was" , "were" , "be" , "been" , "being" , "have" , "has" , "had" , "having" , "do" , "does" , "did" , "doing" , "a" , "an" , "the" , "and" , "but" , "if" , "or" , "because" , "as" , "until" , "while" , "of" , "at" , "by" , "for" , "with" , "about" , "against" , "between" , "into" , "through" , "during" , "before" , "after" , "above" , "below" , "to" , "from" , "up" , "down" , "in" , "out" , "on" , "off" , "over" , "under" , "again" , "further" , "then" , "once" , "here" , "there" , "when" , "where" , "why" , "how" , "all" , "any" , "both" , "each" , "few" , "more" , "most" , "other" , "some" , "such" , "no" , "nor" , "not" , "only" , "own" , "same" , "so" , "than" , "too" , "very" , "s" , "t" , "can" , "will" , "just" , "don" , "don't" , "should" , "should've" , "now" , "d" , "ll" , "m" , "o" , "re" , "ve" , "y" , "ain" , "aren" , "aren't" , "couldn" , "couldn't" , "didn" , "didn't" , "doesn" , "doesn't" , "hadn" , "hadn't" , "hasn" , "hasn't" , "haven" , "haven't" , "isn" , "isn't" , "ma" , "mightn" , "mightn't" , "mustn" , "mustn't" , "needn" , "needn't" , "shan" , "shan't" , "shouldn" , "shouldn't" , "wasn" , "wasn't" , "weren" , "weren't" , "won" , "won't" , "wouldn" , "wouldn't"];
+
+function tokenize(sentence) {
+    //get rid of unreadable text
+    sentence = sentence.replace(/[^\x20-\x7E]/g, '');
+    //make it lowercase
+    sentence = sentence.toLowerCase();
+    //get rid of links
+    sentence = sentence.replace(/(http[s]?:\/\/|www.)(?:[a-zA-Z]|[0-9]|[$-_@.&+]*|[!*\\\\(\\\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))*/g, '');
+    //get rid of digits
+    sentence = sentence.replace(/[0-9]/g, '');
+    //just save words
+    var RegexpTokenizer = new RegExp(/([a-zA-Z]*'[a-zA-Z]*)|(\w+)/i);
+    var tokens = [];
+    var matchObj = RegexpTokenizer.exec(sentence);
+    while (matchObj) {
+        var matchString = matchObj[0];
+        tokens.push(matchString);
+        sentence = sentence.substring(matchObj.index + matchString.length+1);
+        matchObj = RegexpTokenizer.exec(sentence);
+    }
+    var newTokens = [];
+    //get rid of stopwords
+    for (var i = 0; i < tokens.length; i++) {
+        if (stopwords.indexOf(tokens[i]) < 0) {
+            newTokens.push(tokens[i]);
+        }
+    }
+    tokens = newTokens;
+    return tokens
+}
 
 var featuresDict = {}
 for(var i = 0; i < CouponFeatures.length; i++) {
@@ -11,7 +43,7 @@ function get_vector(str) {
     for(var i = 0; i < CouponFeatures.length; i++) {
         vector.push(0);
     }
-    var split = str.split(" ");
+    var split = tokenize(str);
     for(var i = 0; i < split.length; i++) {
         if (split[i].toLowerCase() in featuresDict) {
             vector[featuresDict[split[i].toLowerCase()]] += 1
@@ -28,3 +60,14 @@ function get_prediction(sentence){
 	}
 	return sum
 }
+
+
+
+function test() {
+    console.log(tokenize("I like Turtles"));
+    console.log(tokenize("He doesn't like turtles"));
+    console.log(tokenize("get 10% off"))
+    console.log(tokenize("Check Out My Website: post punctuation text https://www.lawntips.net"));
+}
+
+//test();
