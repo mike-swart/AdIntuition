@@ -126,7 +126,17 @@ function addObserver(){
 function handleChanges(summaries) {
 	remake();
 	logMturkWatch("vidWatch");
-	var desc = document.getElementById("description").getElementsByTagName('a');
+	document.getElementById("description").children[0].style.display = "none";
+	if (document.getElementById("AdIntuitionDescription") === null) {
+		var elem = document.createElement("div");
+		elem.innerHTML = "AdIntuitionLoading";
+		elem.id = "AdIntuitionDescription"
+		document.getElementById("description").appendChild(elem);
+	}
+	while (document.getElementById("AdIntuitionDescription") === null) {continue;}
+	var desc = document.getElementById("description").children[0].innerHTML;
+	document.getElementById("AdIntuitionDescription").innerHTML = desc.replace(/\n/g, '<br>');
+	var desc = document.getElementById("AdIntuitionDescription").getElementsByTagName('a');
 	var haveSeenMatch = false;
 	for (var i=0; i<desc.length; i++) {
 		checkSponsored(i);
@@ -140,11 +150,6 @@ function remake() {
 	removeCouponBanner();
 	//un-highlight video title
 	document.getElementById(TITLE_ELEM_ID).style.backgroundColor = "";
-	//reset any highlighted links
-	elems = document.getElementById("description").getElementsByTagName('a');
-	for (var i=0; i<elems.length; i++) {
-		elems[i].style.backgroundColor = "#FFFFFF";
-	}
 }
 
 function playSound() {
@@ -226,8 +231,8 @@ function addBanner(bannerType) {
 }
 
 function checkSponsored(index) {
-	document.getElementById("description").getElementsByTagName('a')[index].style.backgroundColor = "#FFFFFF";
-	var url = document.getElementById("description").getElementsByTagName('a')[index].innerHTML;
+	document.getElementById("AdIntuitionDescription").getElementsByTagName('a')[index].style.backgroundColor = "#FFFFFF";
+	var url = document.getElementById("AdIntuitionDescription").getElementsByTagName('a')[index].innerHTML;
 	checkRedirect(url, index);
 }
 
@@ -239,7 +244,7 @@ function checkRedirect(url, index) {
 		if (xhr.response === 'true') {
 			//A match was found!!!
 			addBanner("normal");
-			document.getElementById("description").getElementsByTagName('a')[index].style.backgroundColor = HIGHLIGHT_COLOR;
+			document.getElementById("AdIntuitionDescription").getElementsByTagName('a')[index].style.backgroundColor = HIGHLIGHT_COLOR;
 		}
 	}
 	xhr.send();
@@ -273,31 +278,33 @@ function stripLinksFromDesc(descString) {
 
 //load it later because the page is not yet done loading
 async function asyncCallAddBanner() {
-	setTimeout(() => {addBanner("coupon");}, 2000);
+	setTimeout(() => {addBanner("coupon");}, 0001);
 }
 
 function checkForCouponCodes() {
 	//get the description
-	var descString = document.getElementById('description').children[0].innerHTML.toString();
+	var descString = document.getElementById('AdIntuitionDescription').innerHTML.toString();
 	var strippedDescString = stripLinksFromDesc(descString);
-	var sentences = strippedDescString.split(/\n|\.|\r/);
+	var sentences = strippedDescString.split(/\n|\.|\r|<br>/);
+	//console.log(sentences);
 	for(var i = 0; i < sentences.length; i++) {
 		//check each sentence for a coupon code match
 		if (sentences[i].length === 0) {
 			continue;
 		}
 		var prediction = get_prediction(sentences[i]);
+		console.log("matching");
 		if (prediction > 1) {
 			//highlight the portion of the description that we have a match in
 			var highlightSentence = "<span style='background-color:" + COUPON_HIGHLIGHT_COLOR + "'>" + sentences[i] + "</span>";
-			var newDescString = document.getElementById('description').children[0].innerHTML;
+			var newDescString = document.getElementById('AdIntuitionDescription').innerHTML;
 			var startPos = newDescString.indexOf(sentences[i]);
 			if (startPos < 0) {
 				continue;
 			}
 			var endPos = startPos + sentences[i].length
 			var newFinal = newDescString.substring(0, startPos) + highlightSentence + newDescString.substring(endPos);
-			document.getElementById('description').children[0].innerHTML = newFinal;
+			document.getElementById('AdIntuitionDescription').innerHTML = newFinal;
 			asyncCallAddBanner();
 		}
 	}
