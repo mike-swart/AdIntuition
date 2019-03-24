@@ -1,3 +1,24 @@
+function checkRedirects(url) {
+	// var wind = window.open(chrome.runtime.getURL('options.html'), "adintuition")// 'location=true,height=500,width=500,scrollbars=yes,status=yes');
+	// console.log(wind.location.href);
+	// wind.locationbar.visible = true;
+	// wind.onhashchange = function() { 
+	// 	console.log(window.location.href);
+	// }
+	// setTimeout(() => {wind.close();}, 5000);
+
+	// console.log("checking: " + url);
+	// var req = new Request(url, {"redirect": "manual"});
+	// fetch(req).then(function(response) {
+	// 	console.log(response);
+	// 	if (response.type === "opaqueredirect") {
+	// 		console.log(url + "  ->  " + response.url);
+	// 		//checkRedirects(response.url);
+	// 	}
+	// 	return false;
+	// })
+}
+
 //listen to messages
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 	if (!message.function) {
@@ -5,6 +26,9 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 	}
 	else if (message.function === "getMutationSummary") {
 		chrome.tabs.executeScript(sender.tab.id, {file: 'mutation-summary/src/mutation-summary.js'});
+	}
+	else if (message.function === "checkRedirects") {
+		checkRedirects(message.url);
 	}
 	else if (message.function === "getCouponFinder") {
 		chrome.tabs.executeScript(sender.tab.id, {file: 'couponFinder.js'});

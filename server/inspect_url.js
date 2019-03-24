@@ -44,7 +44,7 @@ function checkRedirectsAndMatches(prevUrl, newUrl) {
 	lines = output.split(/[\r\n,\r,\n]+/);
 	//the first line will have the response code after the first white space
 	var responseCode = parseInt(lines[0].split(/[\s]+/)[1]);
-	console.log("Code: " + responseCode + "\t\tmatch: " + matches + " " + utmmatches + "\t\turl: " + url);
+	console.log("Code: " + responseCode + /*"\t\tmatch: " + matches + " " + utmmatches +*/ "\t\turl: " + url);
 	if (responseCode >= 300 && responseCode < 400) {
 		for (var i=1; i<lines.length;i++) {
 			if (lines[i].indexOf("Location") === 0 || lines[i].indexOf("location") === 0) {

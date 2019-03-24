@@ -7,7 +7,7 @@ var SERVER_ADDRESS = "https://ovqz88jgqf.execute-api.us-west-2.amazonaws.com/def
 var TEST_ENSURE_ADDRESS = "https://lj71toig7l.execute-api.us-west-2.amazonaws.com/default/AdIntuitionTracker?user="
 
 //text constants
-const BANNER_NORMAL = "This video contains affiliate links. If you click on highlighted links, the creator recieves a small commission";
+const BANNER_NORMAL = "This video contains affiliate links. If you click on highlighted links, the creator receives a small commission";
 const BANNER_COUPON = "This video may contain affiliate content. Check the highlighted portions in the description";
 const BUTTON_NORMAL = "Exit";
 const BANNER_OPTIONS = {
@@ -70,7 +70,6 @@ function logMturkWatch(actionStr) {
 		xhr.open("GET", TEST_ENSURE_ADDRESS + turk_id + "&action=" + actionStr +"&video=" + urlEnding, true);
 		xhr.onload = function() {
 			console.log(urlEnding + " sent to server");
-
 		}
 		xhr.send()
 	}
@@ -175,12 +174,13 @@ function addBanner(bannerType) {
 		}
 		const bannerConstants = BANNER_OPTIONS[bannerType];
 		var banner = document.createElement("div");
-		banner.innerHTML = "<div id='AdIntuition' style='background-color:" + HIGHLIGHT_COLOR + "; text-align:right; padding-right:10px; padding-bottom:1px; padding-top:1px;'>"+ bannerConstants.text + "&nbsp&nbsp</div>";
+		banner.innerHTML = "<div id='AdIntuition' style='background-color:" + HIGHLIGHT_COLOR + "; padding-left:5px; padding-right:10px; padding-bottom:5px; padding-top:1px;'><span style='display:inline-block;'>"+ bannerConstants.text + "&nbsp&nbsp</span></div>";
 		element = document.getElementById("masthead");
 		element.parentNode.insertBefore(banner, element.nextSibling);
 		var bannerButton = document.createElement("a");
 		bannerButton.classList.add("bannerbutton");
 		bannerButton.innerHTML = bannerConstants.button
+		bannerButton.style.float = "right";
 		bannerButton.onclick = (function() {removeBanner();})
 		document.getElementById("AdIntuition").appendChild(bannerButton);
 
@@ -205,12 +205,13 @@ function addBanner(bannerType) {
 		}
 		const bannerConstants = BANNER_OPTIONS[bannerType];
 		var banner = document.createElement("div");
-		banner.innerHTML = "<div id='AdIntuitionCoupon' style='background-color:" + COUPON_HIGHLIGHT_COLOR + "; text-align:right; padding-right:10px; padding-bottom:1px; padding-top:1px;'>"+ bannerConstants.text + "&nbsp&nbsp</div>";
+		banner.innerHTML = "<div id='AdIntuitionCoupon' style='background-color:" + COUPON_HIGHLIGHT_COLOR + "; padding-left:5px; padding-right:10px; padding-bottom:5px; padding-top:1px;'><span style='display:inline-block;'>"+ bannerConstants.text + "&nbsp&nbsp</span></div>";
 		element = document.getElementById("masthead");
 		element.parentNode.insertBefore(banner, element.nextSibling);
 		var bannerButton = document.createElement("a");
 		bannerButton.classList.add("bannerbutton");
 		bannerButton.innerHTML = bannerConstants.button
+		bannerButton.style.float = "right";
 		bannerButton.onclick = (function() {removeCouponBanner();})
 		document.getElementById("AdIntuitionCoupon").appendChild(bannerButton);
 
@@ -234,6 +235,7 @@ function checkSponsored(index) {
 	document.getElementById("AdIntuitionDescription").getElementsByTagName('a')[index].style.backgroundColor = "#FFFFFF";
 	var url = document.getElementById("AdIntuitionDescription").getElementsByTagName('a')[index].innerHTML;
 	checkRedirect(url, index);
+	//chrome.runtime.sendMessage({"function": "checkRedirects", "url": url});
 }
 
 function checkRedirect(url, index) {
@@ -272,7 +274,7 @@ function highlightTitle() {
 
 function stripLinksFromDesc(descString) {
 	//replace with a newline so that each side will be counted as a different sentence
-	descString = descString.replace(/<a class="yt-simple-endpoint style-scope yt-formatted-string.*<\/a>/g, '\n');
+	descString = descString.replace(/<a class="yt-simple-endpoint style-scope yt-formatted-string.*?<\/a>/g, '\n');
 	return descString;
 }
 
@@ -286,14 +288,12 @@ function checkForCouponCodes() {
 	var descString = document.getElementById('AdIntuitionDescription').innerHTML.toString();
 	var strippedDescString = stripLinksFromDesc(descString);
 	var sentences = strippedDescString.split(/\n|\.|\r|<br>/);
-	//console.log(sentences);
 	for(var i = 0; i < sentences.length; i++) {
 		//check each sentence for a coupon code match
 		if (sentences[i].length === 0) {
 			continue;
 		}
 		var prediction = get_prediction(sentences[i]);
-		console.log("matching");
 		if (prediction > 1) {
 			//highlight the portion of the description that we have a match in
 			var highlightSentence = "<span style='background-color:" + COUPON_HIGHLIGHT_COLOR + "'>" + sentences[i] + "</span>";

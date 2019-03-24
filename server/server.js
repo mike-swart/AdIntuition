@@ -1,6 +1,8 @@
 var port = 4567;
 
 const express = require('express')  
+const JSEncrypt = require('./node_modules/node-jsencrypt/index.js');
+const CryptoJS = require('./node_modules/crypto-js/crypto-js.js')
 
 const app = express()
 
@@ -43,13 +45,31 @@ function checkRedirectsAndMatches(url) {
 	return 200, false;
 }
 
+function getUrlFromEncodings(encodings) {
+	var decrypt = new JSEncrypt();
+	decrypt.setPrivateKey("MIICXQIBAAKBgQDgtuUTP8432z2+e80YoTZaeW8i/0PmocUAXIRuXst2Qp/13c1xWTmkGUhuuCxoh6U0mCzAR5NZUORcEQMlMO18Eh4IBElyvgWu6kKZfK7ypWc+5mrtzpRz49MdUZx5vXkeclFrPUKswAN8ZNONt1VXVWyKeq5lbWmYirOvxu6DuQIDAQABAoGAT5p6q8b+lmrkBIZ2sTLqvkImTI+AzkKgNvCPOUn7aXlQkRhxnqWs9aS/M/mqQZ1LuMXvlG3GlO1C+BpOsu4SMid+539/df/ER5ANaJPVBw0HBCxQRQJcirVRHWrjV691NuGkuIZ7ZKeZT8tj4LJaAcetA09Au5yL4vL2ZvZ1X8ECQQD1cqVdUWv8mtPnf3fUohuGjAPCgjO8zCAyKH7Q+ADp9i8Sdo3dU6LskkBQ6S5oBf7c3LiJYBvPcd7VTcr+iIDPAkEA6mAPkj/zAP7MrBSMB7OfhbyE2e+X0CIpgbk7kb9v+U06/L/vbGrE/DhXubgiBRdfKB99TB9p7wr2PJ3jlRkE9wJBAJj0AKjOfITF1xeED6CqBI0r44vqp2MXsViQc7a1VZx2lY7j4jPyUq0p1nqVVR3t3oyz3yt8gNgdFcfG2qETX3ECQQDCBHtfaijTrhnoaanxxjRMFV80ui5GUcFibeBuKrea/N/T019ztH8U+99DEra22D4hjM/AcFDVXZGxZFK9XlTJAkA3hTNJuSEJeKqaw05MG5dQWk3/PH+iDhoczPUtQTHxCHwLp7DMWBJdh+5XBkHsWZ513R185ER7X0SOr47HqMhT");
+	var uncrypted = decrypt.decrypt(encodings["key"]);
+
+	var decKeyStr = uncrypted.substring(0, uncrypted.indexOf("|"));
+	var decIVStr = uncrypted.substring(uncrypted.indexOf("|")+1);
+
+	var decKey = CryptoJS.enc.Hex.parse(decKeyStr);
+	var decIV = CryptoJS.enc.Hex.parse(decIVStr);
+	var decrypted = CryptoJS.AES.decrypt(encodings["data"], decKey, {mode: CryptoJS.mode.CTR, iv: decIV});
+	var finalString = decrypted.toString(CryptoJS.enc.Utf8);
+	return finalString;
+}
+
 app.use(allowCrossDomain)
 app.use('/', (request, response) => {
 	//expect to be of the form localhost:4567/?url=<insert_url_here>
 	query = request.query;
-	if (query.url) {
-		var redirectExists = checkRedirectsAndMatches(query.url);
-		response.send(redirectExists);
+	if (query.data && query.key) {
+		console.log(getUrlFromEncodings(query));
+		// console.log(typeof(query));
+		response.send(200, true);
+		// var redirectExists = checkRedirectsAndMatches(query.url);
+		// response.send(redirectExists);
 	}
 })
 app.listen(port, (err) => {  
