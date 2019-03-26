@@ -52,14 +52,8 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 		qString = qString.split("+").join("%2B");
 		sendResponse({"urlQueryString": qString})
 	}
-	else if (message.function === "getMutationSummary") {
-		chrome.tabs.executeScript(sender.tab.id, {file: 'modules/mutation-summary/src/mutation-summary.js'});
-	}
 	else if (message.function === "checkRedirects") {
 		checkRedirects(message.url);
-	}
-	else if (message.function === "getCouponFinder") {
-		chrome.tabs.executeScript(sender.tab.id, {file: 'couponFinder.js'});
 	}
 	else if (message.function === "change_icon") {
 		chrome.browserAction.setBadgeText({"text": "open", "tabId": sender.tab.id});

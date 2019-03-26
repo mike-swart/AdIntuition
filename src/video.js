@@ -7,8 +7,8 @@ var SERVER_ADDRESS = "https://ovqz88jgqf.execute-api.us-west-2.amazonaws.com/def
 var TEST_ENSURE_ADDRESS = "https://lj71toig7l.execute-api.us-west-2.amazonaws.com/default/AdIntuitionTracker?user="
 
 //text constants
-const BANNER_NORMAL = "This video contains affiliate links. If you click on highlighted links, the creator receives a small commission";
-const BANNER_COUPON = "This video may contain affiliate content. Check the highlighted portions in the description";
+const BANNER_NORMAL = "This video contains affiliate links. If you click on highlighted links, the creator receives a commission";
+const BANNER_COUPON = "This video may contain affiliate marketing content. The creator may make a commission off of clicks to the highlighted portions of the description";
 const BUTTON_NORMAL = "Exit";
 const BANNER_OPTIONS = {
 	"normal": {
@@ -75,12 +75,11 @@ function logMturkWatch(actionStr) {
 	}
 }
 
-checkMTurkID();
 run();
 
 function run() {
+	checkMTurkID();
 	getOptions();
-	chrome.runtime.sendMessage({"function": "getCouponFinder"});
 	if (!document.getElementById("AdIntuitionMarker")) {
 		addObserver();
 	}
@@ -104,22 +103,17 @@ function getOptions() {
 
 //bug when go to a video with no links-- then does not breakdown the bar
 function addObserver(){
-	try {
-		var observer = new MutationSummary({
-			callback: handleChanges,
-			queries: [
-				{ element: ["yt-formatted-string.content.style-scope.ytd-video-secondary-info-renderer"]},
-				{ element: "yt-formatted-string.content.style-scope.ytd-video-secondary-info-renderer"},
-			] //TODO: if no description is present, then these do not work-- need to figure out #description
-		});
-		var marker = document.createElement("div");
-		marker.id = "AdIntuitionMarker";
-		document.lastElementChild.appendChild(marker);
-	}
-	catch(err) {
-		chrome.runtime.sendMessage({"function": "getMutationSummary"});
-		window.setTimeout(function() {addObserver();}, 20);
-	}
+	var elem = "yt-formatted-string.content.style-scope.ytd-video-secondary-info-renderer";
+	var observer = new MutationSummary({
+		callback: handleChanges,
+		queries: [
+			{ element: [elem]},
+			{ element: elem},
+		] //TODO: if no description is present, then these do not work-- need to figure out #description
+	});
+	var marker = document.createElement("div");
+	marker.id = "AdIntuitionMarker";
+	document.lastElementChild.appendChild(marker);
 }
 
 function handleChanges(summaries) {
