@@ -19,13 +19,41 @@ function checkRedirects(url) {
 	// })
 }
 
+function getRandomString() {
+	const possibleVals = "1234567890ABCDEF";
+	var totString = ""
+	for(var i = 0; i < 32; i++) {
+		totString += possibleVals.charAt(Math.floor(Math.random() * possibleVals.length));
+	}
+	return totString
+}
+
 //listen to messages
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 	if (!message.function) {
 		console.log("Unknown Message Function");
 	}
+	else if (message.function === "getEncodedUrl") {
+		//generate symmetric keys
+		var key = CryptoJS.enc.Hex.parse(getRandomString());
+		var iv = CryptoJS.enc.Hex.parse(getRandomString());
+
+		//encrpt the url
+		var encryptedStr = CryptoJS.AES.encrypt(message.url, key, {mode: CryptoJS.mode.CTR, iv:iv});
+
+		//encyrpt the keys
+		var encrypt = new JSEncrypt();
+		encrypt.setPublicKey("MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDgtuUTP8432z2+e80YoTZaeW8i/0PmocUAXIRuXst2Qp/13c1xWTmkGUhuuCxoh6U0mCzAR5NZUORcEQMlMO18Eh4IBElyvgWu6kKZfK7ypWc+5mrtzpRz49MdUZx5vXkeclFrPUKswAN8ZNONt1VXVWyKeq5lbWmYirOvxu6DuQIDAQAB")
+		var jointStr = key + "|" + iv;
+		var encryptedKeys = encrypt.encrypt(jointStr);
+
+		//prepare the query string
+		var qString = "data=" + encryptedStr.toString() + "&key=" + encryptedKeys;
+		qString = qString.split("+").join("%2B");
+		sendResponse({"urlQueryString": qString})
+	}
 	else if (message.function === "getMutationSummary") {
-		chrome.tabs.executeScript(sender.tab.id, {file: 'mutation-summary/src/mutation-summary.js'});
+		chrome.tabs.executeScript(sender.tab.id, {file: 'modules/mutation-summary/src/mutation-summary.js'});
 	}
 	else if (message.function === "checkRedirects") {
 		checkRedirects(message.url);

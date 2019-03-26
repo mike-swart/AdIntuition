@@ -3,7 +3,7 @@ var HIGHLIGHT_COLOR = "#fccdd3";
 var COUPON_HIGHLIGHT_COLOR = "#fcefce"
 //element to highlight. This is the Title Box
 var TITLE_ELEM_ID = "info-contents";
-var SERVER_ADDRESS = "https://ovqz88jgqf.execute-api.us-west-2.amazonaws.com/default/SocialMediaEndorsements?url="
+var SERVER_ADDRESS = "https://ovqz88jgqf.execute-api.us-west-2.amazonaws.com/default/SocialMediaEndorsements?"
 var TEST_ENSURE_ADDRESS = "https://lj71toig7l.execute-api.us-west-2.amazonaws.com/default/AdIntuitionTracker?user="
 
 //text constants
@@ -240,16 +240,18 @@ function checkSponsored(index) {
 
 function checkRedirect(url, index) {
 	var xhr = new XMLHttpRequest();
-	xhr.open("GET", SERVER_ADDRESS + url, true);
-	xhr.onload = function() {
-		//console.log("code: " + xhr.status + " url: " + url);
-		if (xhr.response === 'true') {
-			//A match was found!!!
-			addBanner("normal");
-			document.getElementById("AdIntuitionDescription").getElementsByTagName('a')[index].style.backgroundColor = HIGHLIGHT_COLOR;
+	chrome.runtime.sendMessage({"function": "getEncodedUrl", "url":url}, function(resp) {
+		xhr.open("GET", SERVER_ADDRESS + resp.urlQueryString, true);
+		xhr.onload = function() {
+			if (xhr.response === 'true') {
+				//A match was found!!!
+				addBanner("normal");
+				document.getElementById("AdIntuitionDescription").getElementsByTagName('a')[index].style.backgroundColor = HIGHLIGHT_COLOR;
+			}
 		}
-	}
-	xhr.send();
+		xhr.send();
+	});
+	// xhr.open("GET", SERVER_ADDRESS + "url=" + url, true);
 }
 
 function removeBanner() {
