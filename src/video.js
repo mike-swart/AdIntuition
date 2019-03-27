@@ -1,6 +1,7 @@
 var NUM_RETRIES = 5;
 var HIGHLIGHT_COLOR = "#fccdd3";
 var COUPON_HIGHLIGHT_COLOR = "#fcefce"
+var UTM_HIGHLIGHT_COLOR = "#fce0ce"
 //element to highlight. This is the Title Box
 var TITLE_ELEM_ID = "info-contents";
 var SERVER_ADDRESS = "https://ovqz88jgqf.execute-api.us-west-2.amazonaws.com/default/SocialMediaEndorsements?"
@@ -249,7 +250,7 @@ function checkRedirect(url, index) {
 				//A match was found!!!
 				addBanner("coupon", COUPON_HIGHLIGHT_COLOR);
 				console.log("here");
-				document.getElementById("AdIntuitionDescription").getElementsByTagName('a')[index].style.backgroundColor = COUPON_HIGHLIGHT_COLOR;
+				document.getElementById("AdIntuitionDescription").getElementsByTagName('a')[index].style.backgroundColor = UTM_HIGHLIGHT_COLOR;
 			}
 		}
 		xhr.send();
