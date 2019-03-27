@@ -6,7 +6,7 @@
     "scripts": ["/modules/jsencrypt.min.js", "/modules/crypto-js/crypto-js.js","background.js"],
     "persistent": false
   },
-  "permissions": ["activeTab", "notifications", "storage", "*://*/?*"],
+  "permissions": ["activeTab", "notifications", "storage", "https://www.youtube.com/*", "https://*.execute-api.us-west-2.amazonaws.com/*"],
   "browser_action": {
     "default_icon": "logos/logo.png",
     "default_title": "Information about AdIntuition",

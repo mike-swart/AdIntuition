@@ -233,6 +233,9 @@ function checkSponsored(index) {
 }
 
 function checkRedirect(url, index) {
+	if (!url) {
+		return;
+	}
 	var xhr = new XMLHttpRequest();
 	chrome.runtime.sendMessage({"function": "getEncodedUrl", "url":url}, function(resp) {
 		xhr.open("GET", SERVER_ADDRESS + resp.urlQueryString, true);
