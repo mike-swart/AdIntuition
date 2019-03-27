@@ -11,17 +11,17 @@ function urlMatches(url) {
 function urlUtmMatches(url) {
 	//check in the ../extra directory to see how we got this string
 	//"There is a business relationship between the content creator"
-	const str = "((utm_source=.*)|(utm_term=.*)|(utm_campaign=.*)|(utm_content=.*)|(utm_medium=.*)){4}"
+	const str = "((utm_source=.*)|(utm_term=.*)|(utm_campaign=.*)|(utm_content=.*)|(utm_medium=.*)|(aff_id=.*)|(campaignid=.*)){1}"
 	var searchPattern = new RegExp(str);
 	return searchPattern.test(url);
 }
 
-function checkRedirectsAndMatches(prevUrl, newUrl) {
+function checkRedirectsAndMatches(prevUrl, newUrl, depth=0) {
 	var url = newUrl;
 	if (url.substring(0,1) == "/") {
 		if (prevUrl === "") {
 			//this is the first time
-			return false
+			return retVal
 		} 
 		var searchPattern = new RegExp("http[s]?:\/\/[^\/\s]*\.[^\/\s]*\.[^\/\s][^\/\s][^\/\s]?\/");
 		var temp = prevUrl.split(searchPattern);
@@ -44,12 +44,12 @@ function checkRedirectsAndMatches(prevUrl, newUrl) {
 	lines = output.split(/[\r\n,\r,\n]+/);
 	//the first line will have the response code after the first white space
 	var responseCode = parseInt(lines[0].split(/[\s]+/)[1]);
-	console.log("Code: " + responseCode + /*"\t\tmatch: " + matches + " " + utmmatches +*/ "\t\turl: " + url);
+	console.log(depth + " Code: " + responseCode + "\t\tmatch: " + matches + " " + utmmatches + "\t\turl: " + url);
 	if (responseCode >= 300 && responseCode < 400) {
 		for (var i=1; i<lines.length;i++) {
 			if (lines[i].indexOf("Location") === 0 || lines[i].indexOf("location") === 0) {
 				var newUrl = lines[i].split(/[\s]+/)[1];
-				checkRedirectsAndMatches(url, newUrl);
+				checkRedirectsAndMatches(url, newUrl, depth+1);
 			}
 		}
 	}
