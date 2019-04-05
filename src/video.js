@@ -125,7 +125,7 @@ function handleChanges(summaries) {
 		var elem = document.createElement("div");
 		elem.innerHTML = "AdIntuitionLoading";
 		elem.id = "AdIntuitionDescription"
-		document.getElementById("description").appendChild(elem);
+		document.getElementById("description").appendChild(elem)
 	}
 	while (document.getElementById("AdIntuitionDescription") === null) {continue;}
 	var desc = document.getElementById("description").children[0].innerHTML;
@@ -240,16 +240,16 @@ function checkRedirect(url, index) {
 	var xhr = new XMLHttpRequest();
 	chrome.runtime.sendMessage({"function": "getEncodedUrl", "url":url}, function(resp) {
 		xhr.open("GET", SERVER_ADDRESS + resp.urlQueryString, true);
+		//console.log(url + "\t " + SERVER_ADDRESS + resp.urlQueryString);
 		xhr.onload = function() {
 			if (xhr.response === 'true') {
 				//A match was found!!!
 				addBanner("normal", HIGHLIGHT_COLOR);
 				document.getElementById("AdIntuitionDescription").getElementsByTagName('a')[index].style.backgroundColor = HIGHLIGHT_COLOR;
 			}
-			else if (xhr.response !== "false") {
+			else if (xhr.response !== "false") { //for some reason, using '=== "utm"' here does not work
 				//A match was found!!!
 				addBanner("coupon", COUPON_HIGHLIGHT_COLOR);
-				console.log("here");
 				document.getElementById("AdIntuitionDescription").getElementsByTagName('a')[index].style.backgroundColor = UTM_HIGHLIGHT_COLOR;
 			}
 		}
@@ -284,9 +284,9 @@ function stripLinksFromDesc(descString) {
 	return descString;
 }
 
-//load it later because the page is not yet done loading
+//load it later because the page is not yet done loading-- the coupon code checks are done too quickly
 async function asyncCallAddBanner() {
-	setTimeout(() => {addBanner("coupon", COUPON_HIGHLIGHT_COLOR);}, 0001);
+	setTimeout(() => {addBanner("coupon", COUPON_HIGHLIGHT_COLOR);}, 0100);
 }
 
 function checkForCouponCodes() {
@@ -300,7 +300,7 @@ function checkForCouponCodes() {
 			continue;
 		}
 		var prediction = get_prediction(sentences[i]);
-		if (prediction > 1) {
+		if (prediction >= 2.06) {
 			//highlight the portion of the description that we have a match in
 			var highlightSentence = "<span style='background-color:" + COUPON_HIGHLIGHT_COLOR + "'>" + sentences[i] + "</span>";
 			var newDescString = document.getElementById('AdIntuitionDescription').innerHTML;
