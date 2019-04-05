@@ -79,7 +79,7 @@ function logMturkWatch(actionStr) {
 run();
 
 function run() {
-	checkMTurkID();
+	//checkMTurkID();
 	getOptions();
 	if (!document.getElementById("AdIntuitionMarker")) {
 		addObserver();
