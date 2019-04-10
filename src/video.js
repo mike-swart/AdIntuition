@@ -256,7 +256,7 @@ function checkRedirect(url, index) {
 	if (!url) {
 		return;
 	}
-	chrome.runtime.sendMessage({"function": "getEncodedUrl", "url":url});
+	chrome.runtime.sendMessage({"function": "checkRedirect", "url":url});
 }
 
 function removeBanner() {
@@ -287,7 +287,7 @@ function stripLinksFromDesc(descString) {
 
 //load it later because the page is not yet done loading-- the coupon code checks are done too quickly
 async function asyncCallAddBanner() {
-	setTimeout(() => {addBanner("coupon", COUPON_HIGHLIGHT_COLOR);}, 0100);
+	setTimeout(() => {addBanner("coupon", COUPON_HIGHLIGHT_COLOR);}, 0200);
 }
 
 function checkForCouponCodes() {

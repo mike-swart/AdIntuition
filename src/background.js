@@ -1,6 +1,6 @@
 var reqIdToUrl = {};
 var urlToResponse = {};
-var urlToTabId = {};
+var urlTotabId = {};
 
 function sendBackValue(reqId) {
 	var url = reqIdToUrl[reqId];
@@ -13,7 +13,6 @@ function sendBackValue(reqId) {
 		var message = {'message': 'highlight', 'url': url, 'type': response};
 		chrome.tabs.sendMessage(tab, message);
 	}
-	console.log(urlToTabId)
 }
 
 function getUrlFromReqId(reqId, url) {
@@ -71,18 +70,16 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 	if (!message.function) {
 		console.log("Unknown Message Function");
 	}
-	else if (message.function === "getEncodedUrl") {
+	else if (message.function === "checkRedirect") {
+		console.log("here");
 		var url = message.url;
 		var xhr = new XMLHttpRequest();
 		xhr.open("GET", url, true);
-		if (!(url in urlToTabId)) {
-			urlToTabId[url] = sender.tab.id;
+		if (!(url in urlTotabId)) {
+			urlTotabId[url] = sender.tab.id;
 		}
 		xhr.onload = function() {}
 		xhr.send();
-	}
-	else if (message.function === "checkRedirects") {
-		checkRedirects(message.url);
 	}
 	else if (message.function === "change_icon") {
 		chrome.browserAction.setBadgeText({"text": "open", "tabId": sender.tab.id});
@@ -93,6 +90,8 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 		var sound = new Audio();
 		sound.src = 'beat2.wav';
 		sound.play();
+		//uncomment this to play 2 beeps instead of 1
+		//window.setTimeout(function() {sound.play();}, 500);
 	}
 	else if (message.function === "reset_icon") {
 		chrome.browserAction.setBadgeText({"text": "", "tabId": sender.tab.id});
@@ -120,8 +119,8 @@ chrome.tabs.onRemoved.addListener(function(tabId, info) {
 			delete urlToTabId[key];
 		}
 		// if (url in urlToResponse) {
-		// 	delete urlToResponse[url];
+		//      delete urlToResponse[url];
 		// }
-	}
-	console.log(urlToTabId);
+}
 });
+
