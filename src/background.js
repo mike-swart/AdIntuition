@@ -11,8 +11,6 @@ function getTabId(url) {
 }
 
 function sendBackValue(reqId) {
-	console.log(urlToTabId);
-	console.log(urlToResponse);
 	var url = reqIdToUrl[reqId];
 	var response = urlToResponse[url];
 
@@ -56,7 +54,7 @@ function sendBackValue(reqId) {
 	delete urlToTabId[url];
 	if (response !== 'false') {
 		var message = {'message': 'highlight', 'url': url, 'type': response};
-		console.log(tab + "\t" + JSON.stringify(message));
+		//console.log(tab + "\t" + JSON.stringify(message));
 		chrome.tabs.sendMessage(tab, message);
 	}
 }
@@ -74,7 +72,7 @@ function checkForRedirects(info) {
 	var reqId = info.requestId
 	var redirects = checkRedirectsAndMatches(url);
 	var urlOriginal = getUrlFromReqId(reqId, url);
-	console.log(info.statusCode + "\t" + url);
+	//console.log(info.statusCode + "\t" + url);
 	if (redirects === 'true') {
 		urlToResponse[urlOriginal] = 'true';
 	}
@@ -92,12 +90,17 @@ chrome.webRequest.onHeadersReceived.addListener(
     		 from = info.initiator;
     	}
     	var ext = "chrome-extension://" + chrome.runtime.id;
-    	if (from === ext) { //what if it does not redirect but still has a hit??
+    	if (from === ext) {
       		if (info.statusCode && info.statusCode >= 300 && info.statusCode < 400) {
       			checkForRedirects(info)
       		}
-      		else if (info.requestId && info.requestId in reqIdToUrl) {
-      			checkForRedirects(info)
+      		// else if (info.requestId && info.requestId in reqIdToUrl) { //we have reached the end of the redirect chain
+      		// 	checkForRedirects(info);
+      		// 	sendBackValue(info.requestId);
+      		// }
+      		else {
+      			//end of redirect chain
+      			checkForRedirects(info);
       			sendBackValue(info.requestId);
       		}
       	}
@@ -129,7 +132,7 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 		if (!(url in urlToTabId)) {
 			urlToTabId[url] = sender.tab.id;
 		}
-		xhr.onload = function() {}
+		//xhr.onload = function() {}
 		xhr.send();
 	}
 	else if (message.function === "change_icon") {
