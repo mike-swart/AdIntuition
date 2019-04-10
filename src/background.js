@@ -1,6 +1,6 @@
 var reqIdToUrl = {};
 var urlToResponse = {};
-var urlTotabId = {};
+var urlToTabId = {};
 
 function sendBackValue(reqId) {
 	var url = reqIdToUrl[reqId];
@@ -71,12 +71,11 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 		console.log("Unknown Message Function");
 	}
 	else if (message.function === "checkRedirect") {
-		console.log("here");
 		var url = message.url;
 		var xhr = new XMLHttpRequest();
 		xhr.open("GET", url, true);
-		if (!(url in urlTotabId)) {
-			urlTotabId[url] = sender.tab.id;
+		if (!(url in urlToTabId)) {
+			urlToTabId[url] = sender.tab.id;
 		}
 		xhr.onload = function() {}
 		xhr.send();
