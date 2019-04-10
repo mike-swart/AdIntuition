@@ -247,7 +247,7 @@ function checkRedirect(url, index) {
 				addBanner("normal", HIGHLIGHT_COLOR);
 				document.getElementById("AdIntuitionDescription").getElementsByTagName('a')[index].style.backgroundColor = HIGHLIGHT_COLOR;
 			}
-			else if (xhr.response !== "false") { //for some reason, using '=== "utm"' here does not work
+			else if (xhr.response === "\"utm\"") {
 				//A match was found!!!
 				addBanner("coupon", COUPON_HIGHLIGHT_COLOR);
 				document.getElementById("AdIntuitionDescription").getElementsByTagName('a')[index].style.backgroundColor = UTM_HIGHLIGHT_COLOR;
