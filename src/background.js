@@ -166,15 +166,12 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 	}
 });
 
-//clean up the dictionaries
+//clean up the dictionaries-- this should not be necessary
 chrome.tabs.onRemoved.addListener(function(tabId, info) {
 	for (key in urlToTabId) {
 		if (urlToTabId[key] === tabId) {
 			delete urlToTabId[key];
 		}
-		// if (url in urlToResponse) {
-		//      delete urlToResponse[url];
-		// }
 }
 });
 

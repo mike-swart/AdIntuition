@@ -6,7 +6,7 @@
     "scripts": ["redirects.js" ,"background.js"],
     "persistent": true
   },
-  "permissions": ["activeTab", "tabs", "notifications", "storage", "webRequest", "*://*/*"],
+  "permissions": ["activeTab", "tabs", "notifications", "storage", "webRequest", "http://*/*", "https://*/*"],
   "browser_action": {
     "default_icon": "logos/logo.png",
     "default_title": "Information about AdIntuition",
