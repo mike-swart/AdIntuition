@@ -2,15 +2,61 @@ var reqIdToUrl = {};
 var urlToResponse = {};
 var urlToTabId = {};
 
+function getTabId(url) {
+	var tab = urlToTabId[url];
+	if (tab) {return tab;}
+	var newUrl = url.substring(0,4) + url.substring(5);
+	tab = urlToTabId[newUrl];
+	return tab;
+}
+
 function sendBackValue(reqId) {
+	console.log(urlToTabId);
+	console.log(urlToResponse);
 	var url = reqIdToUrl[reqId];
 	var response = urlToResponse[url];
-	var tab = urlToTabId[url];
+
 	delete reqIdToUrl[reqId];
 	delete urlToResponse[url];
+
+	//tabId might not have the same Id
+	var tab = urlToTabId[url];
+	if (!tab) {
+		//the original might have been http:// not https://
+		var newUrl = url.substring(0,4) + url.substring(5);
+		tab = urlToTabId[newUrl];
+		if (!tab) {
+			//check for changing of cases-- need to check all keys but list is relatively small
+			for (key in urlToTabId) {
+				if (key.toLowerCase() === url.toLowerCase()) {
+					tab = urlToTabId[key];
+					newUrl = key;
+					if (!tab) {
+						newUrl = url.substring(0,4) + url.substring(5);
+						tab = urlToTabId[newUrl];
+						url = newUrl;
+						if (!tab) {
+							console.log("Cannot find original tab");
+							return;
+						}
+					}
+					else {
+						//the key was found-- change the url to check for in the description
+						url = newUrl;
+					}
+				}
+			}
+		}
+		else {
+			//the https: -> http: fix worked-- change the url to check for in the description
+			url = newUrl;
+		}
+	}
+
 	delete urlToTabId[url];
 	if (response !== 'false') {
 		var message = {'message': 'highlight', 'url': url, 'type': response};
+		console.log(tab + "\t" + JSON.stringify(message));
 		chrome.tabs.sendMessage(tab, message);
 	}
 }
@@ -23,6 +69,22 @@ function getUrlFromReqId(reqId, url) {
 	return reqIdToUrl[reqId];
 }
 
+function checkForRedirects(info) {
+	var url = info.url
+	var reqId = info.requestId
+	var redirects = checkRedirectsAndMatches(url);
+	var urlOriginal = getUrlFromReqId(reqId, url);
+	console.log(info.statusCode + "\t" + url);
+	if (redirects === 'true') {
+		urlToResponse[urlOriginal] = 'true';
+	}
+	else if (redirects === 'utm') {
+		if (urlToResponse[urlOriginal] === 'false') {
+			urlToResponse[urlOriginal] = 'utm';
+		}
+	}
+}
+
 chrome.webRequest.onHeadersReceived.addListener(
     function(info) {
     	var from = ""
@@ -30,22 +92,12 @@ chrome.webRequest.onHeadersReceived.addListener(
     		 from = info.initiator;
     	}
     	var ext = "chrome-extension://" + chrome.runtime.id;
-    	if (from === ext) {
+    	if (from === ext) { //what if it does not redirect but still has a hit??
       		if (info.statusCode && info.statusCode >= 300 && info.statusCode < 400) {
-      			var url = info.url
-      			var reqId = info.requestId
-      			var redirects = checkRedirectsAndMatches(url);
-      			var urlOriginal = getUrlFromReqId(reqId, url);
-      			if (redirects === 'true') {
-      				urlToResponse[urlOriginal] = 'true';
-      			}
-      			else if (redirects === 'utm') {
-      				if (urlToResponse[urlOriginal] === 'false') {
-      					urlToResponse[urlOriginal] = 'utm';
-      				}
-      			}
+      			checkForRedirects(info)
       		}
       		else if (info.requestId && info.requestId in reqIdToUrl) {
+      			checkForRedirects(info)
       			sendBackValue(info.requestId);
       		}
       	}

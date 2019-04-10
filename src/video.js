@@ -26,39 +26,6 @@ var shouldHighlightURL = true;
 var shouldHighlightTitle = false;
 var shouldPlaySound = false;
 var shouldShowDesktopNotification = false;
-var turk_id = ""
-var shouldLog = false;
-
-function checkMTurkID() {
-	chrome.storage.sync.get({
-		mturkID: null,
-	}, function(items) {
-		var id = items.mturkID;
-		if (id === null) {
-			if (confirm("Are you participating in the user study? Press \"Ok\" if yes")) {
-				shouldLog = true;
-				var inputId = prompt("Please enter your Mechanical Turk ID", "abcd1234");
-				chrome.storage.sync.set({
-					mturkID: inputId,
-				}, function() {
-					turk_id = inputId;
-					logMturkWatch("userAdd");
-				});
-			}
-			else {
-				shouldLog = false;
-				chrome.storage.sync.set({
-					mturkID: "notParticipating",
-				}, function() {
-					turk_id = inputId;
-				});
-			}
-		}
-		else {
-			turk_id = id;
-		}
-	})
-}
 
 function highlightUrl(url, color) {
 	var links = document.getElementById("AdIntuitionDescription").getElementsByTagName('a');
@@ -82,24 +49,9 @@ chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
 }
 });
 
-function logMturkWatch(actionStr) {
-	if (shouldLog) {
-		var xhr = new XMLHttpRequest();
-		searchTerm = "watch?v="
-		fullUrl = window.location.href
-		urlEnding = fullUrl.substring(fullUrl.indexOf(searchTerm)+searchTerm.length)
-		xhr.open("GET", TEST_ENSURE_ADDRESS + turk_id + "&action=" + actionStr +"&video=" + urlEnding, true);
-		xhr.onload = function() {
-			console.log(urlEnding + " sent to server");
-		}
-		xhr.send()
-	}
-}
-
 run();
 
 function run() {
-	//checkMTurkID();
 	getOptions();
 	if (!document.getElementById("AdIntuitionMarker")) {
 		addObserver();
@@ -139,7 +91,6 @@ function addObserver(){
 
 function handleChanges(summaries) {
 	remake();
-	logMturkWatch("vidWatch");
 	document.getElementById("description").children[0].style.display = "none";
 	if (document.getElementById("AdIntuitionDescription") === null) {
 		var elem = document.createElement("div");
@@ -199,9 +150,6 @@ function addBanner(bannerType, color) {
 		bannerButton.onclick = (function() {removeBanner();})
 		document.getElementById("AdIntuition").appendChild(bannerButton);
 
-		//send videoShown
-		logMturkWatch("bannerShown");
-
 		//NOTE: Any currently open tabs will need to be refreshed
 		if (!shouldShowBanner) { //use settings
 			document.getElementById("AdIntuition").style.display = "none";
@@ -230,9 +178,6 @@ function addBanner(bannerType, color) {
 		bannerButton.onclick = (function() {removeCouponBanner();})
 		document.getElementById("AdIntuitionCoupon").appendChild(bannerButton);
 
-		//send videoShown
-		logMturkWatch("bannerShown");
-
 		//NOTE: Any currently open tabs will need to be refreshed
 		if (!shouldShowBanner) { //use settings
 			document.getElementById("AdIntuitionCoupon").style.display = "none";
@@ -249,11 +194,8 @@ function addBanner(bannerType, color) {
 function checkSponsored(index) {
 	document.getElementById("AdIntuitionDescription").getElementsByTagName('a')[index].style.backgroundColor = "#FFFFFF";
 	var url = document.getElementById("AdIntuitionDescription").getElementsByTagName('a')[index].innerHTML;
-	checkRedirect(url, index);
-}
-
-function checkRedirect(url, index) {
-	if (!url) {
+	//filter out hashtags and empty values
+	if (!url || url.substring(0,1) === "#") {
 		return;
 	}
 	chrome.runtime.sendMessage({"function": "checkRedirect", "url":url});

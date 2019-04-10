@@ -5,7 +5,7 @@ function urlMatches(url) {
 }
 
 function urlUtmMatches(url) {
-	const str = "((utm_source=.*)|(utm_term=.*)|(utm_campaign=.*)|(utm_content=.*)|(utm_medium=.*)|(aff_id=.*)|(campaignid=.*)){4}"
+	const str = "((utm_source=.*)|(utm_term=.*)|(utm_campaign=.*)|(utm_content=.*)|(utm_medium=.*)|(aff_id=.*)|(campaignid=.*)){1}"
 	var searchPattern = new RegExp(str);
 	return searchPattern.test(url);
 }
