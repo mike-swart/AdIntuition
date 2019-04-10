@@ -60,10 +60,26 @@ function checkMTurkID() {
 	})
 }
 
+function highlightUrl(url, color) {
+	var links = document.getElementById("AdIntuitionDescription").getElementsByTagName('a');
+	for (var i=0; i<links.length; i++) {
+		if (url === links[i].innerHTML) {
+			document.getElementById("AdIntuitionDescription").getElementsByTagName('a')[i].style.backgroundColor = color;
+		}
+	}
+}
+
 chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
   if (msg.message === 'highlight') {
-  	console.log(msg);
-  }
+  	if (msg.type === 'true') {
+  		addBanner("normal", HIGHLIGHT_COLOR);
+		highlightUrl(msg.url, HIGHLIGHT_COLOR);
+	}
+	else if (msg.type === "utm") {
+		addBanner("coupon", COUPON_HIGHLIGHT_COLOR);
+		highlightUrl(msg.url, UTM_HIGHLIGHT_COLOR);
+	}
+}
 });
 
 function logMturkWatch(actionStr) {

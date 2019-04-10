@@ -10,9 +10,10 @@ function sendBackValue(reqId) {
 	delete urlToResponse[url];
 	delete urlToTabId[url];
 	if (response !== 'false') {
-		var message = {'message': 'highlight', 'highlightUrl': url, 'type': response};
+		var message = {'message': 'highlight', 'url': url, 'type': response};
 		chrome.tabs.sendMessage(tab, message);
 	}
+	console.log(urlToTabId)
 }
 
 function getUrlFromReqId(reqId, url) {
@@ -92,8 +93,6 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 		var sound = new Audio();
 		sound.src = 'beat2.wav';
 		sound.play();
-		//uncomment this to play 2 beeps instead of 1
-		//window.setTimeout(function() {sound.play();}, 500);
 	}
 	else if (message.function === "reset_icon") {
 		chrome.browserAction.setBadgeText({"text": "", "tabId": sender.tab.id});
@@ -112,4 +111,17 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
  		};
 		chrome.notifications.create('reminder', notification_options, function(notificationId) {});
 	}
+});
+
+//clean up the dictionaries
+chrome.tabs.onRemoved.addListener(function(tabId, info) {
+	for (key in urlToTabId) {
+		if (urlToTabId[key] === tabId) {
+			delete urlToTabId[key];
+		}
+		// if (url in urlToResponse) {
+		// 	delete urlToResponse[url];
+		// }
+	}
+	console.log(urlToTabId);
 });
