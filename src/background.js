@@ -1,12 +1,18 @@
 var reqIdToUrl = {};
 var urlToResponse = {};
+var urlToTabId = {};
 
 function sendBackValue(reqId) {
 	var url = reqIdToUrl[reqId];
 	var response = urlToResponse[url];
+	var tab = urlToTabId[url];
 	delete reqIdToUrl[reqId];
 	delete urlToResponse[url];
-	console.log(url + "\t" + response);
+	delete urlToTabId[url];
+	if (response !== 'false') {
+		var message = {'message': 'highlight', 'highlightUrl': url, 'type': response};
+		chrome.tabs.sendMessage(tab, message);
+	}
 }
 
 function getUrlFromReqId(reqId, url) {
@@ -68,20 +74,10 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 		var url = message.url;
 		var xhr = new XMLHttpRequest();
 		xhr.open("GET", url, true);
-		//console.log(url + "\t " + SERVER_ADDRESS + resp.urlQueryString);
-		xhr.onload = function() {
-			//console.log(xhr);
-			// if (xhr.response === 'true') {
-			// 	//A match was found!!!
-			// 	addBanner("normal", HIGHLIGHT_COLOR);
-			// 	document.getElementById("AdIntuitionDescription").getElementsByTagName('a')[index].style.backgroundColor = HIGHLIGHT_COLOR;
-			// }
-			// else if (xhr.response !== "false") { //for some reason, using '=== "utm"' here does not work
-			// 	//A match was found!!!
-			// 	addBanner("coupon", COUPON_HIGHLIGHT_COLOR);
-			// 	document.getElementById("AdIntuitionDescription").getElementsByTagName('a')[index].style.backgroundColor = UTM_HIGHLIGHT_COLOR;
-			// }
+		if (!(url in urlToTabId)) {
+			urlToTabId[url] = sender.tab.id;
 		}
+		xhr.onload = function() {}
 		xhr.send();
 	}
 	else if (message.function === "checkRedirects") {

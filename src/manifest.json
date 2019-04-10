@@ -6,7 +6,7 @@
     "scripts": ["/modules/jsencrypt.min.js", "/modules/crypto-js/crypto-js.js", "redirects.js" ,"background.js"],
     "persistent": true
   },
-  "permissions": ["activeTab", "notifications", "storage", "webRequest", "*://*/*"],
+  "permissions": ["activeTab", "tabs", "notifications", "storage", "webRequest", "*://*/*"],
   "browser_action": {
     "default_icon": "logos/logo.png",
     "default_title": "Information about AdIntuition",

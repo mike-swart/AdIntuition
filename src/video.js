@@ -60,6 +60,12 @@ function checkMTurkID() {
 	})
 }
 
+chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
+  if (msg.message === 'highlight') {
+  	console.log(msg);
+  }
+});
+
 function logMturkWatch(actionStr) {
 	if (shouldLog) {
 		var xhr = new XMLHttpRequest();
@@ -228,17 +234,13 @@ function checkSponsored(index) {
 	document.getElementById("AdIntuitionDescription").getElementsByTagName('a')[index].style.backgroundColor = "#FFFFFF";
 	var url = document.getElementById("AdIntuitionDescription").getElementsByTagName('a')[index].innerHTML;
 	checkRedirect(url, index);
-	//chrome.runtime.sendMessage({"function": "checkRedirects", "url": url});
 }
 
 function checkRedirect(url, index) {
 	if (!url) {
 		return;
 	}
-	var xhr = new XMLHttpRequest();
-	chrome.runtime.sendMessage({"function": "getEncodedUrl", "url":url}, function(resp) {
-		console.log(resp);
-	});
+	chrome.runtime.sendMessage({"function": "getEncodedUrl", "url":url});
 }
 
 function removeBanner() {
