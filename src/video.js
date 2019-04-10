@@ -4,8 +4,6 @@ var COUPON_HIGHLIGHT_COLOR = "#fcefce"
 var UTM_HIGHLIGHT_COLOR = "#fce0ce"
 //element to highlight. This is the Title Box
 var TITLE_ELEM_ID = "info-contents";
-var SERVER_ADDRESS = "https://ovqz88jgqf.execute-api.us-west-2.amazonaws.com/default/SocialMediaEndorsements?"
-var TEST_ENSURE_ADDRESS = "https://lj71toig7l.execute-api.us-west-2.amazonaws.com/default/AdIntuitionTracker?user="
 
 //text constants
 const BANNER_NORMAL = "This video contains affiliate links. If you click on highlighted links, the creator receives a commission";
@@ -239,23 +237,8 @@ function checkRedirect(url, index) {
 	}
 	var xhr = new XMLHttpRequest();
 	chrome.runtime.sendMessage({"function": "getEncodedUrl", "url":url}, function(resp) {
-		xhr.open("GET", SERVER_ADDRESS + resp.urlQueryString, true);
-		//console.log(url + "\t " + SERVER_ADDRESS + resp.urlQueryString);
-		xhr.onload = function() {
-			if (xhr.response === 'true') {
-				//A match was found!!!
-				addBanner("normal", HIGHLIGHT_COLOR);
-				document.getElementById("AdIntuitionDescription").getElementsByTagName('a')[index].style.backgroundColor = HIGHLIGHT_COLOR;
-			}
-			else if (xhr.response !== "false") { //for some reason, using '=== "utm"' here does not work
-				//A match was found!!!
-				addBanner("coupon", COUPON_HIGHLIGHT_COLOR);
-				document.getElementById("AdIntuitionDescription").getElementsByTagName('a')[index].style.backgroundColor = UTM_HIGHLIGHT_COLOR;
-			}
-		}
-		xhr.send();
+		console.log(resp);
 	});
-	// xhr.open("GET", SERVER_ADDRESS + "url=" + url, true);
 }
 
 function removeBanner() {
