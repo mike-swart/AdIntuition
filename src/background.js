@@ -103,10 +103,11 @@ chrome.webRequest.onHeadersReceived.addListener(
       			checkForRedirects(info);
       			sendBackValue(info.requestId);
       		}
+      		console.log(info);
       	}
     },
     {
-        urls: ['*://*/*'],
+        urls: ['http://*/*', "https://*/*"],
     },
     ['extraHeaders']
 );
