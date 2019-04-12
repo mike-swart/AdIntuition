@@ -91,10 +91,18 @@ function addObserver(){
 	document.lastElementChild.appendChild(marker);
 }
 
+//make sure that the description has loaded
 function waitForHandle(summaries) {
-	setTimeout(() => {handleChanges(summaries)}, 0300);
+	if (document.getElementById("description")) {
+		handleChanges(summaries);
+	}
+	else {
+		setTimeout(() => {waitForHandle(summaries)}, 0100);
+	}
 }
 
+//hash a string-- useful for checking if we have already checked a description
+//taken from online
 function hashCode(s) {
 	var h = 0, l = s.length, i = 0;
 	if ( l > 0 ) {
@@ -111,7 +119,6 @@ function handleChanges(summaries) {
 		return
 	}
 	descHash = tempHash;
-	console.log("here");
 	remake();
 	document.getElementById("description").children[0].style.display = "none";
 	if (document.getElementById("AdIntuitionDescription") === null) {
