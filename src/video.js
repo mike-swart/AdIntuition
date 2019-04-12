@@ -27,6 +27,8 @@ var shouldHighlightTitle = false;
 var shouldPlaySound = false;
 var shouldShowDesktopNotification = false;
 
+var descHash = 0;
+
 function highlightUrl(url, color) {
 	var links = document.getElementById("AdIntuitionDescription").getElementsByTagName('a');
 	for (var i=0; i<links.length; i++) {
@@ -76,9 +78,9 @@ function getOptions() {
 
 //bug when go to a video with no links-- then does not breakdown the bar
 function addObserver(){
-	var elem = "yt-formatted-string.content.style-scope.ytd-video-secondary-info-renderer";
+	var elem = "yt-formatted-string";
 	var observer = new MutationSummary({
-		callback: handleChanges,
+		callback: waitForHandle,
 		queries: [
 			{ element: [elem]},
 			{ element: elem},
@@ -89,7 +91,27 @@ function addObserver(){
 	document.lastElementChild.appendChild(marker);
 }
 
+function waitForHandle(summaries) {
+	setTimeout(() => {handleChanges(summaries)}, 0300);
+}
+
+function hashCode(s) {
+	var h = 0, l = s.length, i = 0;
+	if ( l > 0 ) {
+		while (i < l) {
+			h = (h << 5) - h + s.charCodeAt(i++) | 0;
+		}
+	}
+	return h;
+};
+
 function handleChanges(summaries) {
+	var tempHash = hashCode(document.getElementById("description").children[0].innerHTML);
+	if (tempHash === descHash) {
+		return
+	}
+	descHash = tempHash;
+	console.log("here");
 	remake();
 	document.getElementById("description").children[0].style.display = "none";
 	if (document.getElementById("AdIntuitionDescription") === null) {
