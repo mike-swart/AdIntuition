@@ -85,7 +85,7 @@ function checkForRedirects(info) {
 
 chrome.webRequest.onHeadersReceived.addListener(
     function(info) {
-    	var from = ""
+    	var from = "";
     	if (info && info.initiator) {
     		 from = info.initiator;
     	}
@@ -103,7 +103,6 @@ chrome.webRequest.onHeadersReceived.addListener(
       			checkForRedirects(info);
       			sendBackValue(info.requestId);
       		}
-      		console.log(info);
       	}
     },
     {
