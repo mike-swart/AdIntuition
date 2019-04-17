@@ -1,5 +1,5 @@
 # AdIntuition
-A Browser Extension to flag affiliate marketing and hopefully sponsored content
+A Browser Extension to flag affiliate marketing and hopefully sponsored content. This version represents the server version
 
 ### Using the extension
 Steps to test the extension while it is still being developed:
