@@ -1,12 +1,12 @@
 {
   "name": "AdIntuition",
-  "version": "1.1.0.2",
+  "version": "1.1.0.1",
   "description": "Automatic sponsored content detection on YouTube",
   "background": {
-    "scripts": ["/modules/jsencrypt.min.js", "/modules/crypto-js/crypto-js.js","background.js"],
-    "persistent": false
+    "scripts": ["redirects.js" ,"background.js"],
+    "persistent": true
   },
-  "permissions": ["activeTab", "notifications", "storage", "https://www.youtube.com/*", "https://*.execute-api.us-west-2.amazonaws.com/*"],
+  "permissions": ["activeTab", "tabs", "notifications", "storage", "webRequest", "http://*/*", "https://*/*"],
   "browser_action": {
     "default_icon": "logos/logo.png",
     "default_title": "Information about AdIntuition",

@@ -4,12 +4,10 @@ var COUPON_HIGHLIGHT_COLOR = "#fcefce"
 var UTM_HIGHLIGHT_COLOR = "#fce0ce"
 //element to highlight. This is the Title Box
 var TITLE_ELEM_ID = "info-contents";
-var SERVER_ADDRESS = "https://ovqz88jgqf.execute-api.us-west-2.amazonaws.com/default/SocialMediaEndorsements?"
-var TEST_ENSURE_ADDRESS = "https://lj71toig7l.execute-api.us-west-2.amazonaws.com/default/AdIntuitionTracker?user="
 
 //text constants
 const BANNER_NORMAL = "This video contains affiliate links. If you click on highlighted links, the creator receives a commission";
-const BANNER_COUPON = "This video may contain affiliate marketing content. The creator may make a commission off of clicks to the highlighted portions of the description";
+const BANNER_COUPON = "This video may contain affiliate marketing content. The creator may make a commission if you click on the highlighted links in the description";
 const BUTTON_NORMAL = "Exit";
 const BANNER_OPTIONS = {
 	"normal": {
@@ -28,58 +26,34 @@ var shouldHighlightURL = true;
 var shouldHighlightTitle = false;
 var shouldPlaySound = false;
 var shouldShowDesktopNotification = false;
-var turk_id = ""
-var shouldLog = false;
 
-function checkMTurkID() {
-	chrome.storage.sync.get({
-		mturkID: null,
-	}, function(items) {
-		var id = items.mturkID;
-		if (id === null) {
-			if (confirm("Are you participating in the user study? Press \"Ok\" if yes")) {
-				shouldLog = true;
-				var inputId = prompt("Please enter your Mechanical Turk ID", "abcd1234");
-				chrome.storage.sync.set({
-					mturkID: inputId,
-				}, function() {
-					turk_id = inputId;
-					logMturkWatch("userAdd");
-				});
-			}
-			else {
-				shouldLog = false;
-				chrome.storage.sync.set({
-					mturkID: "notParticipating",
-				}, function() {
-					turk_id = inputId;
-				});
-			}
-		}
-		else {
-			turk_id = id;
-		}
-	})
-}
+var descHash = 0;
 
-function logMturkWatch(actionStr) {
-	if (shouldLog) {
-		var xhr = new XMLHttpRequest();
-		searchTerm = "watch?v="
-		fullUrl = window.location.href
-		urlEnding = fullUrl.substring(fullUrl.indexOf(searchTerm)+searchTerm.length)
-		xhr.open("GET", TEST_ENSURE_ADDRESS + turk_id + "&action=" + actionStr +"&video=" + urlEnding, true);
-		xhr.onload = function() {
-			console.log(urlEnding + " sent to server");
+function highlightUrl(url, color) {
+	var links = document.getElementById("AdIntuitionDescription").getElementsByTagName('a');
+	for (var i=0; i<links.length; i++) {
+		if (url === links[i].innerHTML) {
+			document.getElementById("AdIntuitionDescription").getElementsByTagName('a')[i].style.backgroundColor = color;
 		}
-		xhr.send()
 	}
 }
+
+chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
+  if (msg.message === 'highlight') {
+  	if (msg.type === 'true') {
+  		addBanner("normal", HIGHLIGHT_COLOR);
+		highlightUrl(msg.url, HIGHLIGHT_COLOR);
+	}
+	else if (msg.type === "utm") {
+		addBanner("coupon", COUPON_HIGHLIGHT_COLOR);
+		highlightUrl(msg.url, UTM_HIGHLIGHT_COLOR);
+	}
+}
+});
 
 run();
 
 function run() {
-	//checkMTurkID();
 	getOptions();
 	if (!document.getElementById("AdIntuitionMarker")) {
 		addObserver();
@@ -104,9 +78,9 @@ function getOptions() {
 
 //bug when go to a video with no links-- then does not breakdown the bar
 function addObserver(){
-	var elem = "yt-formatted-string.content.style-scope.ytd-video-secondary-info-renderer";
+	var elem = "yt-formatted-string";
 	var observer = new MutationSummary({
-		callback: handleChanges,
+		callback: waitForHandle,
 		queries: [
 			{ element: [elem]},
 			{ element: elem},
@@ -117,9 +91,35 @@ function addObserver(){
 	document.lastElementChild.appendChild(marker);
 }
 
+//make sure that the description has loaded
+function waitForHandle(summaries) {
+	if (document.getElementById("description")) {
+		handleChanges(summaries);
+	}
+	else {
+		setTimeout(() => {waitForHandle(summaries)}, 0100);
+	}
+}
+
+//hash a string-- useful for checking if we have already checked a description
+//taken from online
+function hashCode(s) {
+	var h = 0, l = s.length, i = 0;
+	if ( l > 0 ) {
+		while (i < l) {
+			h = (h << 5) - h + s.charCodeAt(i++) | 0;
+		}
+	}
+	return h;
+};
+
 function handleChanges(summaries) {
+	var tempHash = hashCode(document.getElementById("description").children[0].innerHTML);
+	if (tempHash === descHash) {
+		return
+	}
+	descHash = tempHash;
 	remake();
-	logMturkWatch("vidWatch");
 	document.getElementById("description").children[0].style.display = "none";
 	if (document.getElementById("AdIntuitionDescription") === null) {
 		var elem = document.createElement("div");
@@ -179,9 +179,6 @@ function addBanner(bannerType, color) {
 		bannerButton.onclick = (function() {removeBanner();})
 		document.getElementById("AdIntuition").appendChild(bannerButton);
 
-		//send videoShown
-		logMturkWatch("bannerShown");
-
 		//NOTE: Any currently open tabs will need to be refreshed
 		if (!shouldShowBanner) { //use settings
 			document.getElementById("AdIntuition").style.display = "none";
@@ -210,9 +207,6 @@ function addBanner(bannerType, color) {
 		bannerButton.onclick = (function() {removeCouponBanner();})
 		document.getElementById("AdIntuitionCoupon").appendChild(bannerButton);
 
-		//send videoShown
-		logMturkWatch("bannerShown");
-
 		//NOTE: Any currently open tabs will need to be refreshed
 		if (!shouldShowBanner) { //use settings
 			document.getElementById("AdIntuitionCoupon").style.display = "none";
@@ -229,33 +223,11 @@ function addBanner(bannerType, color) {
 function checkSponsored(index) {
 	document.getElementById("AdIntuitionDescription").getElementsByTagName('a')[index].style.backgroundColor = "#FFFFFF";
 	var url = document.getElementById("AdIntuitionDescription").getElementsByTagName('a')[index].innerHTML;
-	checkRedirect(url, index);
-	//chrome.runtime.sendMessage({"function": "checkRedirects", "url": url});
-}
-
-function checkRedirect(url, index) {
-	if (!url) {
+	//filter out hashtags and empty values
+	if (!url || url.substring(0,1) === "#") {
 		return;
 	}
-	var xhr = new XMLHttpRequest();
-	chrome.runtime.sendMessage({"function": "getEncodedUrl", "url":url}, function(resp) {
-		xhr.open("GET", SERVER_ADDRESS + resp.urlQueryString, true);
-		//console.log(url + "\t " + SERVER_ADDRESS + resp.urlQueryString);
-		xhr.onload = function() {
-			if (xhr.response === 'true') {
-				//A match was found!!!
-				addBanner("normal", HIGHLIGHT_COLOR);
-				document.getElementById("AdIntuitionDescription").getElementsByTagName('a')[index].style.backgroundColor = HIGHLIGHT_COLOR;
-			}
-			else if (xhr.response === "\"utm\"") {
-				//A match was found!!!
-				addBanner("coupon", COUPON_HIGHLIGHT_COLOR);
-				document.getElementById("AdIntuitionDescription").getElementsByTagName('a')[index].style.backgroundColor = UTM_HIGHLIGHT_COLOR;
-			}
-		}
-		xhr.send();
-	});
-	// xhr.open("GET", SERVER_ADDRESS + "url=" + url, true);
+	chrome.runtime.sendMessage({"function": "checkRedirect", "url":url});
 }
 
 function removeBanner() {
@@ -286,7 +258,7 @@ function stripLinksFromDesc(descString) {
 
 //load it later because the page is not yet done loading-- the coupon code checks are done too quickly
 async function asyncCallAddBanner() {
-	setTimeout(() => {addBanner("coupon", COUPON_HIGHLIGHT_COLOR);}, 0100);
+	setTimeout(() => {addBanner("coupon", COUPON_HIGHLIGHT_COLOR);}, 0200);
 }
 
 function checkForCouponCodes() {

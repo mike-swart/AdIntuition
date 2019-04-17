@@ -1,23 +1,115 @@
-function checkRedirects(url) {
-	// var wind = window.open(chrome.runtime.getURL('options.html'), "adintuition")// 'location=true,height=500,width=500,scrollbars=yes,status=yes');
-	// console.log(wind.location.href);
-	// wind.locationbar.visible = true;
-	// wind.onhashchange = function() { 
-	// 	console.log(window.location.href);
-	// }
-	// setTimeout(() => {wind.close();}, 5000);
+var reqIdToUrl = {};
+var urlToResponse = {};
+var urlToTabId = {};
 
-	// console.log("checking: " + url);
-	// var req = new Request(url, {"redirect": "manual"});
-	// fetch(req).then(function(response) {
-	// 	console.log(response);
-	// 	if (response.type === "opaqueredirect") {
-	// 		console.log(url + "  ->  " + response.url);
-	// 		//checkRedirects(response.url);
-	// 	}
-	// 	return false;
-	// })
+function getTabId(url) {
+	var tab = urlToTabId[url];
+	if (tab) {return tab;}
+	var newUrl = url.substring(0,4) + url.substring(5);
+	tab = urlToTabId[newUrl];
+	return tab;
 }
+
+function sendBackValue(reqId) {
+	var url = reqIdToUrl[reqId];
+	var response = urlToResponse[url];
+
+	delete reqIdToUrl[reqId];
+	delete urlToResponse[url];
+
+	//tabId might not have the same Id
+	var tab = urlToTabId[url];
+	if (!tab) {
+		//the original might have been http:// not https://
+		var newUrl = url.substring(0,4) + url.substring(5);
+		tab = urlToTabId[newUrl];
+		if (!tab) {
+			//check for changing of cases-- need to check all keys but list is relatively small
+			for (key in urlToTabId) {
+				if (key.toLowerCase() === url.toLowerCase()) {
+					tab = urlToTabId[key];
+					newUrl = key;
+					if (!tab) {
+						newUrl = url.substring(0,4) + url.substring(5);
+						tab = urlToTabId[newUrl];
+						url = newUrl;
+						if (!tab) {
+							console.log("Cannot find original tab");
+							return;
+						}
+					}
+					else {
+						//the key was found-- change the url to check for in the description
+						url = newUrl;
+					}
+				}
+			}
+		}
+		else {
+			//the https: -> http: fix worked-- change the url to check for in the description
+			url = newUrl;
+		}
+	}
+
+	delete urlToTabId[url];
+	if (response !== 'false') {
+		var message = {'message': 'highlight', 'url': url, 'type': response};
+		//console.log(tab + "\t" + JSON.stringify(message));
+		chrome.tabs.sendMessage(tab, message);
+	}
+}
+
+function getUrlFromReqId(reqId, url) {
+	if (!(reqId in reqIdToUrl)) {
+		reqIdToUrl[reqId] = url;
+		urlToResponse[url] = 'false';
+	}
+	return reqIdToUrl[reqId];
+}
+
+function checkForRedirects(info) {
+	var url = info.url
+	var reqId = info.requestId
+	var redirects = checkRedirectsAndMatches(url);
+	var urlOriginal = getUrlFromReqId(reqId, url);
+	//console.log(info.statusCode + "\t" + url);
+	if (redirects === 'true') {
+		urlToResponse[urlOriginal] = 'true';
+	}
+	else if (redirects === 'utm') {
+		if (urlToResponse[urlOriginal] === 'false') {
+			urlToResponse[urlOriginal] = 'utm';
+		}
+	}
+}
+
+chrome.webRequest.onHeadersReceived.addListener(
+    function(info) {
+    	var from = "";
+    	if (info && info.initiator) {
+    		 from = info.initiator;
+    	}
+    	var ext = "chrome-extension://" + chrome.runtime.id;
+    	if (from === ext) {
+      		if (info.statusCode && info.statusCode >= 300 && info.statusCode < 400) {
+      			checkForRedirects(info)
+      		}
+      		// else if (info.requestId && info.requestId in reqIdToUrl) { //we have reached the end of the redirect chain
+      		// 	checkForRedirects(info);
+      		// 	sendBackValue(info.requestId);
+      		// }
+      		else {
+      			//end of redirect chain
+      			checkForRedirects(info);
+      			sendBackValue(info.requestId);
+      		}
+      	}
+    },
+    {
+        urls: ['http://*/*', "https://*/*"],
+    },
+    ['extraHeaders']
+);
 
 function getRandomString() {
 	const possibleVals = "1234567890ABCDEF";
@@ -33,27 +125,15 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 	if (!message.function) {
 		console.log("Unknown Message Function");
 	}
-	else if (message.function === "getEncodedUrl") {
-		//generate symmetric keys
-		var key = CryptoJS.enc.Hex.parse(getRandomString());
-		var iv = CryptoJS.enc.Hex.parse(getRandomString());
-
-		//encrpt the url
-		var encryptedStr = CryptoJS.AES.encrypt(message.url, key, {mode: CryptoJS.mode.CTR, iv:iv});
-
-		//encyrpt the keys
-		var encrypt = new JSEncrypt();
-		encrypt.setPublicKey("MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDgtuUTP8432z2+e80YoTZaeW8i/0PmocUAXIRuXst2Qp/13c1xWTmkGUhuuCxoh6U0mCzAR5NZUORcEQMlMO18Eh4IBElyvgWu6kKZfK7ypWc+5mrtzpRz49MdUZx5vXkeclFrPUKswAN8ZNONt1VXVWyKeq5lbWmYirOvxu6DuQIDAQAB")
-		var jointStr = key + "|" + iv;
-		var encryptedKeys = encrypt.encrypt(jointStr);
-
-		//prepare the query string
-		var qString = "data=" + encryptedStr.toString() + "&key=" + encryptedKeys;
-		qString = qString.split("+").join("%2B");
-		sendResponse({"urlQueryString": qString})
-	}
-	else if (message.function === "checkRedirects") {
-		checkRedirects(message.url);
+	else if (message.function === "checkRedirect") {
+		var url = message.url;
+		var xhr = new XMLHttpRequest();
+		xhr.open("GET", url, true);
+		if (!(url in urlToTabId)) {
+			urlToTabId[url] = sender.tab.id;
+		}
+		//xhr.onload = function() {}
+		xhr.send();
 	}
 	else if (message.function === "change_icon") {
 		chrome.browserAction.setBadgeText({"text": "open", "tabId": sender.tab.id});
@@ -85,3 +165,13 @@ chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 		chrome.notifications.create('reminder', notification_options, function(notificationId) {});
 	}
 });
+
+//clean up the dictionaries-- this should not be necessary
+chrome.tabs.onRemoved.addListener(function(tabId, info) {
+	for (key in urlToTabId) {
+		if (urlToTabId[key] === tabId) {
+			delete urlToTabId[key];
+		}
+}
+});
+
