@@ -38,6 +38,18 @@ function highlightUrl(url, color) {
 	}
 }
 
+function getNewInfo() {
+	var xhr = new XMLHttpRequest();
+	xhr.open("GET", "https://mike-swart.github.io/AdIntutionData/should-log.json", true);
+	xhr.onload = function() {
+		var shouldLog = JSON.parse(this.responseText).shouldLogData;
+		//console.log(shouldLog);
+	}
+	xhr.send();
+}
+
+getNewInfo();
+
 chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
   if (msg.message === 'highlight') {
   	if (msg.type === 'true') {
