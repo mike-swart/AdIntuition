@@ -33,10 +33,6 @@ function sendBackValue(reqId) {
 						newUrl = url.substring(0,4) + url.substring(5);
 						tab = urlToTabId[newUrl];
 						url = newUrl;
-						if (!tab) {
-							console.log("Cannot find original tab");
-							return;
-						}
 					}
 					else {
 						//the key was found-- change the url to check for in the description
@@ -54,7 +50,10 @@ function sendBackValue(reqId) {
 	delete urlToTabId[url];
 	if (response !== 'false') {
 		var message = {'message': 'highlight', 'url': url, 'type': response};
-		//console.log(tab + "\t" + JSON.stringify(message));
+		if (!tab) {
+			console.log("Cannot find original tab"); //this can happen if a link is repeated in a description
+			return;
+		}
 		chrome.tabs.sendMessage(tab, message);
 	}
 }

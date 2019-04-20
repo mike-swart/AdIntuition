@@ -4,6 +4,8 @@ var COUPON_HIGHLIGHT_COLOR = "#fcefce"
 var UTM_HIGHLIGHT_COLOR = "#fce0ce"
 //element to highlight. This is the Title Box
 var TITLE_ELEM_ID = "info-contents";
+var userId = null;
+var TEST_ENSURE_ADDRESS = "https://lj71toig7l.execute-api.us-west-2.amazonaws.com/default/AdIntuitionTracker?user="
 
 //text constants
 const BANNER_NORMAL = "This video contains affiliate links. If you click on highlighted links, the creator receives a commission";
@@ -26,6 +28,7 @@ var shouldHighlightURL = true;
 var shouldHighlightTitle = false;
 var shouldPlaySound = false;
 var shouldShowDesktopNotification = false;
+var shouldLog = false;
 
 var descHash = 0;
 
@@ -41,10 +44,12 @@ function highlightUrl(url, color) {
 chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
   if (msg.message === 'highlight') {
   	if (msg.type === 'true') {
+  		logAction("aff", msg.url);
   		addBanner("normal", HIGHLIGHT_COLOR);
 		highlightUrl(msg.url, HIGHLIGHT_COLOR);
 	}
 	else if (msg.type === "utm") {
+		logAction("utm", msg.url);
 		addBanner("coupon", COUPON_HIGHLIGHT_COLOR);
 		highlightUrl(msg.url, UTM_HIGHLIGHT_COLOR);
 	}
@@ -53,7 +58,56 @@ chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
 
 run();
 
+function getID() {
+	chrome.storage.sync.get({
+		userId: null,
+	}, function(items) {
+		var id = items.userId;
+		console.log(id);
+		if (id === null) {
+			var generatedId = Math.floor((Math.random() * Number.MAX_SAFE_INTEGER));
+			console.log(generatedId);
+			chrome.storage.sync.set({
+				userId: generatedId,
+			}, function() {
+				userId = generatedId;
+				logAction("userAdd", "");
+			});
+			if (confirm("Are you willing to share your data with AdIntuition to help improve the extension? You can always change your choice in the settings page.")) {
+				shouldLog = true;
+				chrome.storage.sync.set({shouldLog: true});
+			}
+			else {
+				shouldLog = false;
+				chrome.storage.sync.set({shouldLog: false});
+			}
+		}
+		else {
+			userId = id;
+		}
+	})
+}
+
+function logAction(actionStr, highlightedPortion) {
+	if (shouldLog) {
+		var xhr = new XMLHttpRequest();
+		searchTerm = "watch?v=";
+		fullUrl = window.location.href;
+		urlEnding = fullUrl.substring(fullUrl.indexOf(searchTerm)+searchTerm.length);
+		var qUrl = TEST_ENSURE_ADDRESS + userId + "&action=" + actionStr + "&video=" + urlEnding + "&highlighted=" + encodeURIComponent(highlightedPortion);
+		xhr.open("GET", qUrl, true);
+		xhr.onload = function() {
+			var shouldContinue = this.responseText;
+			if (!shouldContinue) {
+				shouldLog = false;
+			}
+		}
+		xhr.send()
+	}
+}
+
 function run() {
+	getID();
 	getOptions();
 	if (!document.getElementById("AdIntuitionMarker")) {
 		addObserver();
@@ -67,12 +121,14 @@ function getOptions() {
 		titleHighlighted: false,
 		sound: false,
 		desktopNotification: false,
+		shouldLog: false,
 	}, function(items) {
 		shouldShowBanner = items.banner;
 		shouldHighlightURL = items.textHighlighted;
 		shouldHighlightTitle = items.titleHighlighted;
 		shouldPlaySound = items.sound;
 		shouldShowDesktopNotification = items.desktopNotification;
+		shouldLog = items.shouldLog;
 	});
 }
 
@@ -275,6 +331,7 @@ function checkForCouponCodes() {
 		if (prediction >= 2.06) {
 			//highlight the portion of the description that we have a match in
 			var highlightSentence = "<span style='background-color:" + COUPON_HIGHLIGHT_COLOR + "'>" + sentences[i] + "</span>";
+			logAction("couponCode", sentences[i]);
 			var newDescString = document.getElementById('AdIntuitionDescription').innerHTML;
 			var startPos = newDescString.indexOf(sentences[i]);
 			if (startPos < 0) {

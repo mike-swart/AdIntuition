@@ -4,6 +4,7 @@ function saveSettings() {
 	var shouldHighlightTitle = document.getElementById('title-highlight').checked;
 	var shouldHaveSound = document.getElementById('sound-played').checked;
 	var desktopNotif = document.getElementById('desktop-notification').checked;
+	var sendData = document.getElementById('send-data').checked;
 	if (!shouldHaveBanner && !shouldHighlightText && !shouldHighlightTitle && !shouldHaveSound && !desktopNotif) {
 		alert("Please select at least one option");
 		return
@@ -13,7 +14,8 @@ function saveSettings() {
 		textHighlighted: shouldHighlightText,
 		titleHighlighted: shouldHighlightTitle,
 		sound: shouldHaveSound,
-		desktopNotification: desktopNotif
+		desktopNotification: desktopNotif,
+		shouldLog: sendData
 	}, function() {
 		console.log('saved settings');
 	});
@@ -29,12 +31,14 @@ function restore_options() {
 		titleHighlighted: false,
 		sound: false,
 		desktopNotification: false,
+		shouldLog: false,
 	}, function(items) {
 		document.getElementById('banner').checked = items.banner;
 		document.getElementById('text-highlight').checked = items.textHighlighted;
 		document.getElementById('title-highlight').checked = items.titleHighlighted;
 		document.getElementById('sound-played').checked = items.sound;
 		document.getElementById('desktop-notification').checked = items.desktopNotification;
+		document.getElementById('send-data').checked = items.shouldLog;
 	});
 }
 
