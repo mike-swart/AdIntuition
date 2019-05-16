@@ -7,7 +7,7 @@ var TITLE_ELEM_ID = "info-contents";
 
 //text constants
 const BANNER_NORMAL = "This video contains affiliate links. If you click on highlighted links, the creator receives a commission";
-const BANNER_COUPON = "This video may contain affiliate marketing content. The creator may make a commission if you click on the highlighted links in the description";
+const BANNER_COUPON = "This video may contain affiliate marketing content. The creator may make a commission if you click on the highlighted portions of the description";
 const BUTTON_NORMAL = "Exit";
 const BANNER_OPTIONS = {
 	"normal": {
@@ -272,7 +272,7 @@ function checkForCouponCodes() {
 			continue;
 		}
 		var prediction = get_prediction(sentences[i]);
-		if (prediction >= 2.06) {
+		if (prediction >= 1.5) {
 			//highlight the portion of the description that we have a match in
 			var highlightSentence = "<span style='background-color:" + COUPON_HIGHLIGHT_COLOR + "'>" + sentences[i] + "</span>";
 			var newDescString = document.getElementById('AdIntuitionDescription').innerHTML;
