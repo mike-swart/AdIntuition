@@ -2,6 +2,8 @@ var reqIdToUrl = {};
 var urlToResponse = {};
 var urlToTabId = {};
 
+var SERVER_STRING = "https://lj71toig7l.execute-api.us-west-2.amazonaws.com/default/AdIntuitionTracker"
+
 function getTabId(url) {
 	var tab = urlToTabId[url];
 	if (tab) {return tab;}
@@ -71,7 +73,6 @@ function checkForRedirects(info) {
 	var reqId = info.requestId
 	var redirects = checkRedirectsAndMatches(url);
 	var urlOriginal = getUrlFromReqId(reqId, url);
-	//console.log(info.statusCode + "\t" + url);
 	if (redirects === 'true') {
 		urlToResponse[urlOriginal] = 'true';
 	}
@@ -90,13 +91,13 @@ chrome.webRequest.onHeadersReceived.addListener(
     	}
     	var ext = "chrome-extension://" + chrome.runtime.id;
     	if (from === ext) {
+    		//Make sure that it was not a call to the server for logging purposes
+    		if (info.url.substring(0,SERVER_STRING.length) === SERVER_STRING) { 
+    			return;
+    		}
       		if (info.statusCode && info.statusCode >= 300 && info.statusCode < 400) {
       			checkForRedirects(info)
       		}
-      		// else if (info.requestId && info.requestId in reqIdToUrl) { //we have reached the end of the redirect chain
-      		// 	checkForRedirects(info);
-      		// 	sendBackValue(info.requestId);
-      		// }
       		else {
       			//end of redirect chain
       			checkForRedirects(info);
@@ -123,6 +124,19 @@ function getRandomString() {
 chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 	if (!message.function) {
 		console.log("Unknown Message Function");
+	}
+	else if (message.function === 'logToServer') {
+		var xhr = new XMLHttpRequest();
+		var qUrl = message.qUrl;
+		xhr.open("GET", qUrl, true);
+		xhr.onload = function() {
+			var shouldContinue = JSON.parse(this.responseText)['shouldLog'];
+			shouldContinue = true;
+			if (!shouldContinue) {
+				chrome.storage.sync.set({shouldLog: false});
+			}
+		}
+		xhr.send();
 	}
 	else if (message.function === "checkRedirect") {
 		var url = message.url;

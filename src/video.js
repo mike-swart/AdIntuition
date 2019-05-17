@@ -23,13 +23,10 @@ const BANNER_OPTIONS = {
 }
 
 //settings
-var shouldShowBanner = true;
-var shouldHighlightURL = true;
-var shouldHighlightTitle = false;
-var shouldPlaySound = false;
-var shouldShowDesktopNotification = false;
-var shouldLog = false;
-
+var shouldLog = true;
+var shouldHighlightUTM = true;
+var shouldHighlightAff = true;
+var shouldHighlightCoupon = true;
 var descHash = 0;
 
 function highlightUrl(url, color) {
@@ -43,12 +40,12 @@ function highlightUrl(url, color) {
 
 chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
   if (msg.message === 'highlight') {
-  	if (msg.type === 'true') {
+  	if (msg.type === 'true' && shouldHighlightAff) {
   		logAction("aff", msg.url);
   		addBanner("normal", HIGHLIGHT_COLOR);
 		highlightUrl(msg.url, HIGHLIGHT_COLOR);
 	}
-	else if (msg.type === "utm") {
+	else if (msg.type === "utm" && shouldHighlightUTM) {
 		logAction("utm", msg.url);
 		addBanner("coupon", COUPON_HIGHLIGHT_COLOR);
 		highlightUrl(msg.url, UTM_HIGHLIGHT_COLOR);
@@ -63,24 +60,23 @@ function getID() {
 		userId: null,
 	}, function(items) {
 		var id = items.userId;
-		console.log(id);
+		//console.log(id);
 		if (id === null) {
 			var generatedId = Math.floor((Math.random() * Number.MAX_SAFE_INTEGER));
-			console.log(generatedId);
 			chrome.storage.sync.set({
 				userId: generatedId,
 			}, function() {
 				userId = generatedId;
 				logAction("userAdd", "");
 			});
-			if (confirm("Are you willing to share your data with AdIntuition to help improve the extension? You can always change your choice in the settings page.")) {
+			//if (confirm("Are you willing to share your data with AdIntuition to help improve the extension? You can always change your choice in the settings page.")) {
 				shouldLog = true;
 				chrome.storage.sync.set({shouldLog: true});
-			}
+			/*}
 			else {
 				shouldLog = false;
 				chrome.storage.sync.set({shouldLog: false});
-			}
+			}*/
 		}
 		else {
 			userId = id;
@@ -90,19 +86,14 @@ function getID() {
 
 function logAction(actionStr, highlightedPortion) {
 	if (shouldLog) {
-		var xhr = new XMLHttpRequest();
 		searchTerm = "watch?v=";
 		fullUrl = window.location.href;
 		urlEnding = fullUrl.substring(fullUrl.indexOf(searchTerm)+searchTerm.length);
 		var qUrl = TEST_ENSURE_ADDRESS + userId + "&action=" + actionStr + "&video=" + urlEnding + "&highlighted=" + encodeURIComponent(highlightedPortion);
-		xhr.open("GET", qUrl, true);
-		xhr.onload = function() {
-			var shouldContinue = this.responseText;
-			if (!shouldContinue) {
-				shouldLog = false;
-			}
+		if (actionStr === "vidWatch") {
+			qUrl = TEST_ENSURE_ADDRESS + userId + "&action=" + actionStr;
 		}
-		xhr.send()
+		chrome.runtime.sendMessage({"function": "logToServer", 'qUrl': qUrl});
 	}
 }
 
@@ -116,19 +107,15 @@ function run() {
 
 function getOptions() {
 	chrome.storage.sync.get({
-		banner: true,
-		textHighlighted: true,
-		titleHighlighted: false,
-		sound: false,
-		desktopNotification: false,
-		shouldLog: false,
+		shouldLog: true,
+		shouldShowCoupons: true,
+		shouldShowUTM: true,
+		shouldShowAff: true,
 	}, function(items) {
-		shouldShowBanner = items.banner;
-		shouldHighlightURL = items.textHighlighted;
-		shouldHighlightTitle = items.titleHighlighted;
-		shouldPlaySound = items.sound;
-		shouldShowDesktopNotification = items.desktopNotification;
 		shouldLog = items.shouldLog;
+		shouldHighlightUTM = items.shouldShowUTM;
+		shouldHighlightAff = items.shouldShowAff;
+		shouldHighlightCoupon = items.shouldShowCoupons;
 	});
 }
 
@@ -175,6 +162,7 @@ function handleChanges(summaries) {
 		return
 	}
 	descHash = tempHash;
+	logAction("vidWatch", "");
 	remake();
 	document.getElementById("description").children[0].style.display = "none";
 	if (document.getElementById("AdIntuitionDescription") === null) {
@@ -191,7 +179,9 @@ function handleChanges(summaries) {
 	for (var i=0; i<desc.length; i++) {
 		checkSponsored(i);
 	}
-	checkForCouponCodes();
+	if (shouldHighlightCoupon) {
+		checkForCouponCodes();
+	}
 }
 
 function remake() {
@@ -200,12 +190,6 @@ function remake() {
 	removeCouponBanner();
 	//un-highlight video title
 	document.getElementById(TITLE_ELEM_ID).style.backgroundColor = "";
-}
-
-function playSound() {
-	if (shouldPlaySound) {
-		chrome.runtime.sendMessage({"function": "play_sound"});
-	}
 }
 
 function showDesktopNotification() {
@@ -234,17 +218,6 @@ function addBanner(bannerType, color) {
 		bannerButton.style.float = "right";
 		bannerButton.onclick = (function() {removeBanner();})
 		document.getElementById("AdIntuition").appendChild(bannerButton);
-
-		//NOTE: Any currently open tabs will need to be refreshed
-		if (!shouldShowBanner) { //use settings
-			document.getElementById("AdIntuition").style.display = "none";
-		}
-		else {
-			document.getElementById("AdIntuition").style.display = "block";
-		}
-		playSound();
-		showDesktopNotification();
-		highlightTitle();
 	}
 	else if (bannerType === "coupon") {
 		//in case banner is not selected in settings, add another invisible tag
@@ -262,17 +235,6 @@ function addBanner(bannerType, color) {
 		bannerButton.style.float = "right";
 		bannerButton.onclick = (function() {removeCouponBanner();})
 		document.getElementById("AdIntuitionCoupon").appendChild(bannerButton);
-
-		//NOTE: Any currently open tabs will need to be refreshed
-		if (!shouldShowBanner) { //use settings
-			document.getElementById("AdIntuitionCoupon").style.display = "none";
-		}
-		else {
-			document.getElementById("AdIntuitionCoupon").style.display = "block";
-		}
-		playSound();
-		showDesktopNotification();
-		highlightTitle();
 	}
 }
 
@@ -298,12 +260,6 @@ function removeCouponBanner() {
 	if (element) {
     	element.parentNode.removeChild(element);
     }
-}
-
-function highlightTitle() {
-	if (document.getElementById(TITLE_ELEM_ID) !== null && shouldHighlightTitle) { //the element is not yet found
-		document.getElementById(TITLE_ELEM_ID).style.backgroundColor = HIGHLIGHT_COLOR;
-	}
 }
 
 function stripLinksFromDesc(descString) {

@@ -9,49 +9,57 @@
   <h2>Customize your AdIntuition Experience</h2>
   <div style="font-size:20px;">
     <div id="settings-box" style="padding-bottom:20px;">
-    	<div>
-    		<label>
-    			<input type="checkbox" id="banner">
-    		</label>
-        Show a dropdown banner below the youtube search bar
-    	</div>
-    	<div>
-    		<label>
-    			<input type="checkbox" id="text-highlight">
-    		</label>
-        Highlight any affiliated marketing links in the description
-    	</div>
-      <div>
-        <label>
-          <input type="checkbox" id="desktop-notification">
-        </label>
-        Show a desktop notification
+      <div style="padding-top:5px;border:solid;">
+        <div style="padding-top:5px;padding-left:5px;">What types of Affiliate Marketing do you want to be notified of?</div>
+        <div style="padding-left:5px;font-size:12px;color:#ff0000;">Warning: Unchecking these boxes will reduce the number of videos that are flagged by the extension</div>
+        <div style="padding:5px;"> 
+          <label>
+            <input type="checkbox" id="coupons">
+          </label>
+          Coupon Codes
+        </div>
+        <div style="padding:5px;"> 
+          <label>
+            <input type="checkbox" id="aff" disabled>
+          </label>
+          Known Affiliate Link Patterns
+        </div>
+        <div style="padding:5px;"> 
+          <label>
+            <input type="checkbox" id="utm">
+          </label>
+          Links with UTM Parameters
+        </div>
       </div>
-    	<div>
-    		<label>
-    			<input type="checkbox" id="title-highlight">
-    		</label>
-        Highlight the video title
-    	</div>
-      <div>
-        <label>
-          <input type="checkbox" id="sound-played">
-        </label>
-        Play a sound
-        <a href="#" id="hear-sound" class="button1">Hear the Sound</a>
-      </div>
-      <div style="padding-top:30px;">
-        <label>
-          <input type="checkbox" id="send-data">
-        </label>
-        Are you willing to share information with AdIntuition?
-        <div style="font-size:12px; padding-top:5px">AdIntuition will not save any information about you personally, but will track what videos AdIntuition was invoked on and what elements of a description are highlighted</div>
+      <div style="padding-top:20px;"/>
+      <div style="padding-top:5px;border:solid;">
+        <div style="padding-top:5px;padding-left:5px;font-size:30px;">User Data</div>
+        <div style="padding:3px;"> 
+          <label>
+            <input type="checkbox" id="send-data">
+          </label>
+          Are you willing to share information with AdIntuition?
+          <div style="font-size:12px; padding:5px">AdIntuition will not save any information about you personally, but will track what videos AdIntuition was invoked on and what elements of a description are highlighted</div>
+        </div>
+        <div style="padding:3px; font-size:12px">
+          <a href="#" id="downloadData" class="button1" >Download Your Data</a>
+          Click this button to see what information AdIntuition has stored about you
+        </div>
+        <div style="padding:3px; font-size:12px">
+          <a href="#" id="deleteData" class="button1" style="background-color:#ff0000">Delete Data</a>
+          Delete the most recent 
+          <select id="deleteNumber"></select> 
+          elements
+          <div style="padding-left:5px;font-size:12px;color:#ff0000;">Deleting your data is not reversible. AdIntuition is a research project available for free. Sharing your data allows for the extension to be improved, directly benefitting you, the user.</div>
+        </div>
       </div>
     </div>
-  	<a href="#" id="save" class="button">Save</a>
-    <a href="#" id="cancel" class="button" style="background-color:#ff0000">Cancel</a>
-    <div style="font-size:12px; padding-top:5px">(Check to enable the feature. Uncheck to disable.)</div>
-    <div style="font-size:12px; padding-top:5px">Note: After changing settings, any open YouTube pages will need to be reloaded for the changes to be reflected.</div>
+    <div style="padding-top:15px;">
+    	<a href="#" id="save" class="button">Save</a>
+      <a href="#" id="cancel" class="button" style="background-color:#ff0000">Cancel</a>
+      <div style="font-size:12px; padding-top:5px">(Check to enable the feature. Uncheck to disable.)</div>
+      <div style="font-size:12px; padding-top:5px">Note: After changing settings, any open YouTube pages will need to be reloaded for the changes to be reflected.</div>
+    </div>
   	<script src="options.js"></script>
   </div>
 </body>
