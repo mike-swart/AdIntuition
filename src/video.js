@@ -63,15 +63,14 @@ function getID() {
 		//console.log(id);
 		if (id === null) {
 			var generatedId = Math.floor((Math.random() * Number.MAX_SAFE_INTEGER));
+			userId = generatedId;
 			chrome.storage.sync.set({
 				userId: generatedId,
-			}, function() {
-				userId = generatedId;
-				logAction("userAdd", "");
-			});
+			}, function() {});
 			//if (confirm("Are you willing to share your data with AdIntuition to help improve the extension? You can always change your choice in the settings page.")) {
-				shouldLog = true;
-				chrome.storage.sync.set({shouldLog: true});
+			shouldLog = true;
+			logAction("userAdd", "");
+			chrome.storage.sync.set({shouldLog: true});
 			/*}
 			else {
 				shouldLog = false;
@@ -90,7 +89,8 @@ function logAction(actionStr, highlightedPortion) {
 		fullUrl = window.location.href;
 		urlEnding = fullUrl.substring(fullUrl.indexOf(searchTerm)+searchTerm.length);
 		var qUrl = TEST_ENSURE_ADDRESS + userId + "&action=" + actionStr + "&video=" + urlEnding + "&highlighted=" + encodeURIComponent(highlightedPortion);
-		if (actionStr === "vidWatch") {
+		if (actionStr === "vidWatch" || actionStr === "userAdd") {
+			console.log(actionStr);
 			qUrl = TEST_ENSURE_ADDRESS + userId + "&action=" + actionStr;
 		}
 		chrome.runtime.sendMessage({"function": "logToServer", 'qUrl': qUrl});
