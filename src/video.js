@@ -55,14 +55,23 @@ chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
 
 run();
 
+function getRandomId() {
+	var value = "";
+	var possibleValues = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+	for (var i=0; i<43; i++) {
+		var index = Math.floor((Math.random()*possibleValues.length));
+		value += possibleValues.charAt(index);
+	}
+	return value;
+}
+
 function getID() {
 	chrome.storage.sync.get({
 		userId: null,
 	}, function(items) {
 		var id = items.userId;
-		//console.log(id);
 		if (id === null) {
-			var generatedId = Math.floor((Math.random() * Number.MAX_SAFE_INTEGER));
+			var generatedId = getRandomId();
 			userId = generatedId;
 			chrome.storage.sync.set({
 				userId: generatedId,
@@ -90,7 +99,6 @@ function logAction(actionStr, highlightedPortion) {
 		urlEnding = fullUrl.substring(fullUrl.indexOf(searchTerm)+searchTerm.length);
 		var qUrl = TEST_ENSURE_ADDRESS + userId + "&action=" + actionStr + "&video=" + urlEnding + "&highlighted=" + encodeURIComponent(highlightedPortion);
 		if (actionStr === "vidWatch" || actionStr === "userAdd") {
-			console.log(actionStr);
 			qUrl = TEST_ENSURE_ADDRESS + userId + "&action=" + actionStr;
 		}
 		chrome.runtime.sendMessage({"function": "logToServer", 'qUrl': qUrl});
