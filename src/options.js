@@ -98,6 +98,7 @@ function deleteData() {
 			document.getElementById('deleteData').innerHTML = "Delete Items";
 			document.getElementById('deleteData').style.backgroundColor = "#ff0000";
 			document.getElementById('deleteData').disabled = false;
+			document.getElementById('deleteNumber').value = 0;
 		}, 2000);
 	}
 	xhr.send()
