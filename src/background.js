@@ -95,6 +95,16 @@ chrome.webRequest.onHeadersReceived.addListener(
     		if (info.url.substring(0,SERVER_STRING.length) === SERVER_STRING) { 
     			return;
     		}
+    		// var responseHeaders = info.responseHeaders;
+    		// for (var i=0; i<responseHeaders.length; i++) {
+    		// 	var hdr = responseHeaders[i];
+    		// 	if (hdr.name === "Refresh") {
+    		// 		var searchTerm = "URL=";
+    		// 		var newUrl = hdr.value.substring(hdr.value.indexOf(searchTerm) + searchTerm.length);
+    		// 		console.log(newUrl);
+    		// 		console.log(newUrl.length);
+    		// 	}
+    		// }
       		if (info.statusCode && info.statusCode >= 300 && info.statusCode < 400) {
       			checkForRedirects(info)
       		}
@@ -108,7 +118,7 @@ chrome.webRequest.onHeadersReceived.addListener(
     {
         urls: ['http://*/*', "https://*/*"],
     },
-    ['extraHeaders']
+    ["responseHeaders"]
 );
 
 function getRandomString() {

@@ -24,7 +24,7 @@ function saveSettings() {
 // stored in chrome.storage.
 function restore_options() {	
 	chrome.storage.sync.get({
-		shouldLog: false,
+		shouldLog: true,
 		shouldShowCoupons: true,
 		shouldShowUTM: true,
 		shouldShowAff: true,
