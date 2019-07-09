@@ -1,49 +1,53 @@
 var userID = 0;
 
 function saveSettings() {
-	var sendData = document.getElementById('send-data').checked;
-	var coups = document.getElementById('coupons').checked;
-	var utms = document.getElementById('utm').checked;
-	var affs = document.getElementById('aff').checked;
-	if (!coups && !utms && !affs) {
-		alert("At least one Affiliate Marketing type must be checked");
-		return;
-	}
-	browser.storage.local.set({
-		shouldLog: sendData,
-		shouldShowCoupons: coups,
-		shouldShowUTM: utms,
-		shouldShowAff: affs,
-	}, function() {
-		console.log('saved settings');
-	});
-	window.close();
+	// var sendData = document.getElementById('send-data').checked;
+	// var coups = document.getElementById('coupons').checked;
+	// var utms = document.getElementById('utm').checked;
+	// var affs = document.getElementById('aff').checked;
+	// if (!coups && !utms && !affs) {
+	// 	alert("At least one Affiliate Marketing type must be checked");
+	// 	return;
+	// }
+	// chrome.storage.sync.set({
+	// 	shouldLog: sendData,
+	// 	shouldShowCoupons: coups,
+	// 	shouldShowUTM: utms,
+	// 	shouldShowAff: affs,
+	// }, function() {
+	// 	console.log('saved settings');
+	// });
+	// window.close();
 }
 
 // Restores select box and checkbox state using the preferences
 // stored in chrome.storage.
 function restore_options() {
-	browser.storage.local.get({
-		shouldLog: true,
-		shouldShowCoupons: true,
-		shouldShowUTM: true,
-		shouldShowAff: true,
-		userId: 0,
-	}, function(items) {
-		document.getElementById('send-data').checked = items.shouldLog;
-		document.getElementById('coupons').checked = items.shouldShowCoupons;
-		document.getElementById('utm').checked = items.shouldShowUTM;
-		document.getElementById('aff').checked = items.shouldShowAff;
-		userID = items.userId;
-	});
-	deleteSelector = document.getElementById('deleteNumber');
-	var numbers = [0,1,2,5,10,20,25];
-	for (var i=0; i<numbers.length; i++) {	
-		var opt = document.createElement('option');
-		opt.appendChild(document.createTextNode(numbers[i]));
-		opt.value = numbers[i];
-		deleteSelector.appendChild(opt);
-	}
+	// chrome.storage.sync.get({
+	// 	shouldLog: true,
+	// 	shouldShowCoupons: true,
+	// 	shouldShowUTM: true,
+	// 	shouldShowAff: true,
+	// 	userId: 0,
+	// }, function(items) {
+	// 	document.getElementById('send-data').checked = items.shouldLog;
+	// 	document.getElementById('coupons').checked = items.shouldShowCoupons;
+	// 	document.getElementById('utm').checked = items.shouldShowUTM;
+	// 	document.getElementById('aff').checked = items.shouldShowAff;
+	// 	userID = items.userId;
+	// });
+	// deleteSelector = document.getElementById('deleteNumber');
+	// var numbers = [0,1,2,5,10,20,25];
+	// for (var i=0; i<numbers.length; i++) {	
+	// 	var opt = document.createElement('option');
+	// 	opt.appendChild(document.createTextNode(numbers[i]));
+	// 	opt.value = numbers[i];
+	// 	deleteSelector.appendChild(opt);
+	// }
+}
+
+function playSound() {
+	//chrome.runtime.sendMessage({"function": "play_sound"});
 }
 
 function cancel() {

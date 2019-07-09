@@ -20,9 +20,7 @@
       "run_at": "document_start"
     }
   ],
-  "options_ui": {
-    "page": "options.html"
-  },
+  "options_page": "options.html",
   "icons": {
     "16": "logos/logo.png",
     "48": "logos/logo.png",

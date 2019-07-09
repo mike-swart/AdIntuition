@@ -38,7 +38,7 @@ function highlightUrl(url, color) {
 	}
 }
 
-browser.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
+chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
   if (msg.message === 'highlight') {
   	if (msg.type === 'true' && shouldHighlightAff) {
   		logAction("aff", msg.url);
@@ -65,32 +65,32 @@ function getRandomId() {
 	return value;
 }
 
-function getID() {
-	browser.storage.local.get({
-		userId: null,
-	}, function(items) {
-		var id = items.userId;
-		if (id === null) {
-			var generatedId = getRandomId();
-			userId = generatedId;
-			browser.storage.local.set({
-				userId: generatedId,
-			}, function() {});
-			//if (confirm("Are you willing to share your data with AdIntuition to help improve the extension? You can always change your choice in the settings page.")) {
-			shouldLog = true;
-			logAction("userAdd", "");
-			browser.storage.local.set({shouldLog: true});
-			/*}
-			else {
-				shouldLog = false;
-				chrome.storage.sync.set({shouldLog: false});
-			}*/
-		}
-		else {
-			userId = id;
-		}
-	})
-}
+// function getID() {
+// 	chrome.storage.sync.get({
+// 		userId: null,
+// 	}, function(items) {
+// 		var id = items.userId;
+// 		if (id === null) {
+// 			var generatedId = getRandomId();
+// 			userId = generatedId;
+// 			chrome.storage.sync.set({
+// 				userId: generatedId,
+// 			}, function() {});
+// 			//if (confirm("Are you willing to share your data with AdIntuition to help improve the extension? You can always change your choice in the settings page.")) {
+// 			shouldLog = true;
+// 			logAction("userAdd", "");
+// 			chrome.storage.sync.set({shouldLog: true});
+// 			/*}
+// 			else {
+// 				shouldLog = false;
+// 				chrome.storage.sync.set({shouldLog: false});
+// 			}*/
+// 		}
+// 		else {
+// 			userId = id;
+// 		}
+// 	})
+// }
 
 function logAction(actionStr, highlightedPortion) {
 	if (shouldLog) {
@@ -101,31 +101,31 @@ function logAction(actionStr, highlightedPortion) {
 		if (actionStr === "vidWatch" || actionStr === "userAdd") {
 			qUrl = TEST_ENSURE_ADDRESS + userId + "&action=" + actionStr;
 		}
-		browser.runtime.sendMessage({"function": "logToServer", 'qUrl': qUrl});
+		chrome.runtime.sendMessage({"function": "logToServer", 'qUrl': qUrl});
 	}
 }
 
 function run() {
-	// getID();
-	// getOptions();
+	getID();
+	getOptions();
 	if (!document.getElementById("AdIntuitionMarker")) {
 		addObserver();
 	}
 }
 
-function getOptions() {
-	browser.storage.local.get({
-		shouldLog: true,
-		shouldShowCoupons: true,
-		shouldShowUTM: true,
-		shouldShowAff: true,
-	}, function(items) {
-		shouldLog = items.shouldLog;
-		shouldHighlightUTM = items.shouldShowUTM;
-		shouldHighlightAff = items.shouldShowAff;
-		shouldHighlightCoupon = items.shouldShowCoupons;
-	});
-}
+// function getOptions() {
+// 	chrome.storage.sync.get({
+// 		shouldLog: true,
+// 		shouldShowCoupons: true,
+// 		shouldShowUTM: true,
+// 		shouldShowAff: true,
+// 	}, function(items) {
+// 		shouldLog = items.shouldLog;
+// 		shouldHighlightUTM = items.shouldShowUTM;
+// 		shouldHighlightAff = items.shouldShowAff;
+// 		shouldHighlightCoupon = items.shouldShowCoupons;
+// 	});
+// }
 
 //bug when go to a video with no links-- then does not breakdown the bar
 function addObserver(){
@@ -202,7 +202,7 @@ function remake() {
 
 function showDesktopNotification() {
 	if (shouldShowDesktopNotification) {
-		browser.runtime.sendMessage({"function": "open_desktop_notification"});
+		chrome.runtime.sendMessage({"function": "open_desktop_notification"});
 	}
 }
 
@@ -253,7 +253,7 @@ function checkSponsored(index) {
 	if (!url || url.substring(0,1) === "#") {
 		return;
 	}
-	browser.runtime.sendMessage({"function": "checkRedirect", "url":url});
+	chrome.runtime.sendMessage({"function": "checkRedirect", "url":url});
 }
 
 function removeBanner() {

@@ -83,15 +83,14 @@ function checkForRedirects(info) {
 	}
 }
 
-browser.webRequest.onHeadersReceived.addListener(
+chrome.webRequest.onHeadersReceived.addListener(
     function(info) {
     	var from = "";
-    	console.log(info);
-    	if (info && info.originUrl) {
-    		 from = info.originUrl;
+    	if (info && info.initiator) {
+    		 from = info.initiator;
     	}
-    	var ext = "moz-extension://";
-     	if (from.substring(0, ext.length) === ext) {
+    	var ext = "chrome-extension://" + chrome.runtime.id;
+    	if (from === ext) {
     		//Make sure that it was not a call to the server for logging purposes
     		if (info.url.substring(0,SERVER_STRING.length) === SERVER_STRING) { 
     			return;
@@ -132,7 +131,7 @@ function getRandomString() {
 }
 
 //listen to messages
-browser.runtime.onMessage.addListener(function(message, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 	if (!message.function) {
 		console.log("Unknown Message Function");
 	}
@@ -144,7 +143,7 @@ browser.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 			var shouldContinue = JSON.parse(this.responseText)['shouldLog'];
 			shouldContinue = true;
 			if (!shouldContinue) {
-				browser.storage.sync.set({shouldLog: false});
+				chrome.storage.sync.set({shouldLog: false});
 			}
 		}
 		xhr.send();
@@ -160,9 +159,9 @@ browser.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 		xhr.send();
 	}
 	else if (message.function === "change_icon") {
-		browser.browserAction.setBadgeText({"text": "open", "tabId": sender.tab.id});
-		browser.browserAction.setBadgeBackgroundColor({"color": "#cfd1b1", "tabId": sender.tab.id});
-		browser.browserAction.setIcon({"path":message.icon, "tabId": sender.tab.id});
+		chrome.browserAction.setBadgeText({"text": "open", "tabId": sender.tab.id});
+		chrome.browserAction.setBadgeBackgroundColor({"color": "#cfd1b1", "tabId": sender.tab.id});
+		chrome.browserAction.setIcon({"path":message.icon, "tabId": sender.tab.id});
 	}
 	else if (message.function === "play_sound") {
 		var sound = new Audio();
@@ -172,17 +171,26 @@ browser.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 		//window.setTimeout(function() {sound.play();}, 500);
 	}
 	else if (message.function === "reset_icon") {
-		browser.browserAction.setBadgeText({"text": "", "tabId": sender.tab.id});
-		browser.browserAction.setBadgeBackgroundColor({"color": "#FFFFFF", "tabId": sender.tab.id});
-		browser.browserAction.setIcon({"path":message.icon, "tabId": sender.tab.id});
+		chrome.browserAction.setBadgeText({"text": "", "tabId": sender.tab.id});
+		chrome.browserAction.setBadgeBackgroundColor({"color": "#FFFFFF", "tabId": sender.tab.id});
+		chrome.browserAction.setIcon({"path":message.icon, "tabId": sender.tab.id});
 	}
 	else if (message.function === "log") {
 		console.log(message.message);
 	}
+	else if (message.function === "open_desktop_notification") {
+		const notification_options = {
+		    "type": 'basic',
+		    "iconUrl": "logos/logo.png",
+		    "title": 'AdIntuition',
+		    "message": 'This page has sponsored content',
+ 		};
+		chrome.notifications.create('reminder', notification_options, function(notificationId) {});
+	}
 });
 
 //clean up the dictionaries-- this should not be necessary
-browser.tabs.onRemoved.addListener(function(tabId, info) {
+chrome.tabs.onRemoved.addListener(function(tabId, info) {
 	for (key in urlToTabId) {
 		if (urlToTabId[key] === tabId) {
 			delete urlToTabId[key];
