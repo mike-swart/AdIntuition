@@ -106,8 +106,8 @@ function logAction(actionStr, highlightedPortion) {
 }
 
 function run() {
-	// getID();
-	// getOptions();
+	getID();
+	getOptions();
 	if (!document.getElementById("AdIntuitionMarker")) {
 		addObserver();
 	}

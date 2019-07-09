@@ -146,7 +146,7 @@ browser.runtime.onMessage.addListener(function(message, sender, sendResponse) {
 			var shouldContinue = JSON.parse(this.responseText)['shouldLog'];
 			shouldContinue = true;
 			if (!shouldContinue) {
-				browser.storage.sync.set({shouldLog: false});
+				browser.storage.local.set({shouldLog: false});
 			}
 		}
 		xhr.send();
