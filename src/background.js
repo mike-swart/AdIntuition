@@ -86,12 +86,14 @@ function checkForRedirects(info) {
 browser.webRequest.onHeadersReceived.addListener(
     function(info) {
     	var from = "";
-    	console.log(info);
     	if (info && info.originUrl) {
     		 from = info.originUrl;
     	}
-    	var ext = "moz-extension://";
-     	if (from.substring(0, ext.length) === ext) {
+    	var ext = "moz-extension://.*/adintuitionbackground.html";
+    	var searchPattern = new RegExp(ext);
+    	var matches = searchPattern.test(from);
+    	console.log(matches);
+     	if (matches) {
     		//Make sure that it was not a call to the server for logging purposes
     		if (info.url.substring(0,SERVER_STRING.length) === SERVER_STRING) { 
     			return;

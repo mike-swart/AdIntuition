@@ -3,7 +3,7 @@
   "version": "1.1.0.3",
   "description": "Automatic Sponsorship Detection on YouTube",
   "background": {
-    "scripts": ["redirects.js" ,"background.js"],
+    "page": "adintuitionbackground.html",
     "persistent": true
   },
   "permissions": ["activeTab", "tabs", "storage", "webRequest", "http://*/*", "https://*/*"],
