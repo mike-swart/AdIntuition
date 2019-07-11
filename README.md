@@ -7,6 +7,7 @@ For more information about the extension, feel free to consult our [Q&A](https:/
 
 #### Downloading
 [Download for Google Chrome](https://chrome.google.com/webstore/detail/adintuition/pjpiddgaambjenhikcpbcbgjckidgpce)
+
 [Download for FireFox](https://addons.mozilla.org/en-US/firefox/addon/adintuition/)
 
 #### Developing on Chrome
