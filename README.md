@@ -1,15 +1,26 @@
 # AdIntuition
-A Browser Extension to detect and disclose affiliate marketing content
+A Browser Extension to detect and disclose affiliate marketing content.
+
+For more information about the extension, feel free to consult our [Q&A](https://hci.princeton.edu/adintuition).
 
 ### Using the extension
-Steps to test the extension while it is still being developed:
+
+#### Downloading
+[Download for Google Chrome](https://chrome.google.com/webstore/detail/adintuition/pjpiddgaambjenhikcpbcbgjckidgpce)
+[Download for FireFox](https://addons.mozilla.org/en-US/firefox/addon/adintuition/)
+
+#### Developing on Chrome
 * Go to `chrome://extensions`
 * Toggle `developer mode` on in the upper right hand corner
 * Click `Load Unpacked` and then select the `src` folder in this directory
+* To package the extension into a .zip, run the `zip_src.sh` script
 
-### Research Question
-How successfully can we show that there are advertisements on a social media platform? We will be focusing on YouTube, but the methods that we use will be possible to extend onto other platforms. What is the best way to display this data so that users can understand that the content creator is benefitting from the post?
-
+#### Developing for FireFox
+* Checkout the `firefox` branch of this repo
+* zip the source folder using the `zip_src.sh` script
+* Navigate to `about:debugging` in the browser
+* Click on the `Load Temporary Add-on...` button on the upper right side of the page
+* select the zipped source folder
 
 ### Contents Layout
 
@@ -21,5 +32,8 @@ How successfully can we show that there are advertisements on a social media pla
 | src/logos/                     | Folder containing any necessary logos                                      |
 | server/                        | Folder containing code to check for url redirects and regex matches        |
 
+### Licensing
+
+AdIntuition uses an MIT License
 
 
