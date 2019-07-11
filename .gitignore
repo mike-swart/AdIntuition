@@ -2,3 +2,5 @@
 *.ipynb_checkpoints
 *.zip
 server/node_modules
+tests/screenshots
+*.crx
