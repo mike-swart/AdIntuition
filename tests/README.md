@@ -1,4 +1,4 @@
-#Testing the Extension
+# Testing the Extension
 * `pip install selenium`
 * Download the chrome version that your browser currently runs from [here](https://sites.google.com/a/chromium.org/chromedriver/downloads) and add it to your /usr/local/bin folder
 * Create a version of the extension that does not log data to the server
