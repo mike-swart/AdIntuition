@@ -1,7 +1,6 @@
 var userID = 0;
 
 function saveSettings() {
-	var sendData = document.getElementById('send-data').checked;
 	var coups = document.getElementById('coupons').checked;
 	var utms = document.getElementById('utm').checked;
 	var affs = document.getElementById('aff').checked;
@@ -24,13 +23,11 @@ function saveSettings() {
 // stored in chrome.storage.
 function restore_options() {
 	chrome.storage.sync.get({
-		shouldLog: true,
 		shouldShowCoupons: true,
 		shouldShowUTM: true,
 		shouldShowAff: true,
 		userId: 0,
 	}, function(items) {
-		document.getElementById('send-data').checked = items.shouldLog;
 		document.getElementById('coupons').checked = items.shouldShowCoupons;
 		document.getElementById('utm').checked = items.shouldShowUTM;
 		document.getElementById('aff').checked = items.shouldShowAff;

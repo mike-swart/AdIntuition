@@ -23,7 +23,6 @@ const BANNER_OPTIONS = {
 }
 
 //settings
-var shouldLog = true;
 var shouldHighlightUTM = true;
 var shouldHighlightAff = true;
 var shouldHighlightCoupon = true;
@@ -41,12 +40,10 @@ function highlightUrl(url, color) {
 chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
   if (msg.message === 'highlight') {
   	if (msg.type === 'true' && shouldHighlightAff) {
-  		logAction("aff", msg.url);
   		addBanner("normal", HIGHLIGHT_COLOR);
 		highlightUrl(msg.url, HIGHLIGHT_COLOR);
 	}
 	else if (msg.type === "utm" && shouldHighlightUTM) {
-		logAction("utm", msg.url);
 		addBanner("coupon", COUPON_HIGHLIGHT_COLOR);
 		highlightUrl(msg.url, UTM_HIGHLIGHT_COLOR);
 	}
@@ -65,48 +62,7 @@ function getRandomId() {
 	return value;
 }
 
-function getID() {
-	chrome.storage.sync.get({
-		userId: null,
-	}, function(items) {
-		var id = items.userId;
-		if (id === null) {
-			var generatedId = getRandomId();
-			userId = generatedId;
-			chrome.storage.sync.set({
-				userId: generatedId,
-			}, function() {});
-			//if (confirm("Are you willing to share your data with AdIntuition to help improve the extension? You can always change your choice in the settings page.")) {
-			shouldLog = true;
-			logAction("userAdd", "");
-			chrome.storage.sync.set({shouldLog: true});
-			/*}
-			else {
-				shouldLog = false;
-				chrome.storage.sync.set({shouldLog: false});
-			}*/
-		}
-		else {
-			userId = id;
-		}
-	})
-}
-
-function logAction(actionStr, highlightedPortion) {
-	if (shouldLog) {
-		searchTerm = "watch?v=";
-		fullUrl = window.location.href;
-		urlEnding = fullUrl.substring(fullUrl.indexOf(searchTerm)+searchTerm.length);
-		var qUrl = TEST_ENSURE_ADDRESS + userId + "&action=" + actionStr + "&video=" + urlEnding + "&highlighted=" + encodeURIComponent(highlightedPortion);
-		if (actionStr === "vidWatch" || actionStr === "userAdd") {
-			qUrl = TEST_ENSURE_ADDRESS + userId + "&action=" + actionStr;
-		}
-		chrome.runtime.sendMessage({"function": "logToServer", 'qUrl': qUrl});
-	}
-}
-
 function run() {
-	getID();
 	getOptions();
 	if (!document.getElementById("AdIntuitionMarker")) {
 		addObserver();
@@ -115,12 +71,10 @@ function run() {
 
 function getOptions() {
 	chrome.storage.sync.get({
-		shouldLog: true,
 		shouldShowCoupons: true,
 		shouldShowUTM: true,
 		shouldShowAff: true,
 	}, function(items) {
-		shouldLog = items.shouldLog;
 		shouldHighlightUTM = items.shouldShowUTM;
 		shouldHighlightAff = items.shouldShowAff;
 		shouldHighlightCoupon = items.shouldShowCoupons;
@@ -170,7 +124,6 @@ function handleChanges(summaries) {
 		return
 	}
 	descHash = tempHash;
-	logAction("vidWatch", "");
 	remake();
 	document.getElementById("description").children[0].style.display = "none";
 	if (document.getElementById("AdIntuitionDescription") === null) {
@@ -295,7 +248,6 @@ function checkForCouponCodes() {
 		if (prediction >= 1.5) {
 			//highlight the portion of the description that we have a match in
 			var highlightSentence = "<span style='background-color:" + COUPON_HIGHLIGHT_COLOR + "'>" + sentences[i] + "</span>";
-			logAction("couponCode", sentences[i]);
 			var newDescString = document.getElementById('AdIntuitionDescription').innerHTML;
 			var startPos = newDescString.indexOf(sentences[i]);
 			if (startPos < 0) {
