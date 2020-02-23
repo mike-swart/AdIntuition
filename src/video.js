@@ -63,6 +63,7 @@ function getRandomId() {
 }
 
 function run() {
+	getId();
 	getOptions();
 	if (!document.getElementById("AdIntuitionMarker")) {
 		addObserver();
@@ -79,6 +80,33 @@ function getOptions() {
 		shouldHighlightAff = items.shouldShowAff;
 		shouldHighlightCoupon = items.shouldShowCoupons;
 	});
+}
+
+function getID() {
+	chrome.storage.sync.get({
+		userId: null,
+	}, function(items) {
+		var id = items.userId;
+		if (id === null) {
+			var generatedId = getRandomId();
+			userId = generatedId;
+			chrome.storage.sync.set({
+				userId: generatedId,
+			}, function() {});
+			//if (confirm("Are you willing to share your data with AdIntuition to help improve the extension? You can always change your choice in the settings page.")) {
+			shouldLog = true;
+			logAction("userAdd", "");
+			chrome.storage.sync.set({shouldLog: true});
+			/*}
+			else {
+				shouldLog = false;
+				chrome.storage.sync.set({shouldLog: false});
+			}*/
+		}
+		else {
+			userId = id;
+		}
+	})
 }
 
 //bug when go to a video with no links-- then does not breakdown the bar

@@ -9,7 +9,6 @@ function saveSettings() {
 		return;
 	}
 	chrome.storage.sync.set({
-		shouldLog: sendData,
 		shouldShowCoupons: coups,
 		shouldShowUTM: utms,
 		shouldShowAff: affs,
