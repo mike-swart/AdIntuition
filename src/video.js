@@ -62,26 +62,6 @@ function getRandomId() {
 	return value;
 }
 
-function run() {
-	getId();
-	getOptions();
-	if (!document.getElementById("AdIntuitionMarker")) {
-		addObserver();
-	}
-}
-
-function getOptions() {
-	chrome.storage.sync.get({
-		shouldShowCoupons: true,
-		shouldShowUTM: true,
-		shouldShowAff: true,
-	}, function(items) {
-		shouldHighlightUTM = items.shouldShowUTM;
-		shouldHighlightAff = items.shouldShowAff;
-		shouldHighlightCoupon = items.shouldShowCoupons;
-	});
-}
-
 function getID() {
 	chrome.storage.sync.get({
 		userId: null,
@@ -107,6 +87,26 @@ function getID() {
 			userId = id;
 		}
 	})
+}
+
+function run() {
+	getID();
+	getOptions();
+	if (!document.getElementById("AdIntuitionMarker")) {
+		addObserver();
+	}
+}
+
+function getOptions() {
+	chrome.storage.sync.get({
+		shouldShowCoupons: true,
+		shouldShowUTM: true,
+		shouldShowAff: true,
+	}, function(items) {
+		shouldHighlightUTM = items.shouldShowUTM;
+		shouldHighlightAff = items.shouldShowAff;
+		shouldHighlightCoupon = items.shouldShowCoupons;
+	});
 }
 
 //bug when go to a video with no links-- then does not breakdown the bar
